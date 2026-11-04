@@ -534,7 +534,14 @@ public class GamePanel extends JPanel{
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                openFile();
+                if (!isStarted) {
+                    openFile();
+                }
+                else
+                {
+                    JOptionPane.showMessageDialog(null,"Please STOP to START Again", "Warning",JOptionPane.WARNING_MESSAGE);
+                }
+                
             }
             
         });
@@ -579,6 +586,36 @@ public class GamePanel extends JPanel{
         randomButton = new JButton(randomIcon);
         inputPopulation = new JTextField();
 
+        inputPopulation.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    int population = Integer.parseInt(inputPopulation.getText());
+                    if (population>0) {
+                        startGame(population,false);
+                    menuLayout.show(menuCard, "Event");
+                    timeSystem.start();//เริ่มเวลาในเกมส์
+                    stopEvent = false;
+                    }
+                    else
+                    {
+                        JOptionPane.showMessageDialog(null,"Please enter population from one or more.", "Input Error",JOptionPane.ERROR_MESSAGE);
+                    }
+                    
+                } catch (NumberFormatException x) {
+                    if (inputPopulation.getText().equals("")) {
+                        JOptionPane.showMessageDialog(null,"Please enter the population", "Input Error",JOptionPane.ERROR_MESSAGE);
+                    }
+                    else
+                    {
+                        JOptionPane.showMessageDialog(null,"Please enter the population as an integer.", "Input Error",JOptionPane.ERROR_MESSAGE);
+                    } 
+                }
+            }
+            
+        });
+
         okButton.setBounds(153, 94, 26, 17);
         randomButton.setBounds(12, 123, 165, 40);
         inputPopulation.setBounds(80, 92, 80, 22);
@@ -597,12 +634,25 @@ public class GamePanel extends JPanel{
             public void actionPerformed(ActionEvent e) {
                 try {
                     int population = Integer.parseInt(inputPopulation.getText());
-                    startGame(population,false);
+                    if (population>0) {
+                        startGame(population,false);
                     menuLayout.show(menuCard, "Event");
                     timeSystem.start();//เริ่มเวลาในเกมส์
                     stopEvent = false;
+                    }
+                    else
+                    {
+                        JOptionPane.showMessageDialog(null,"Please enter population from one or more.", "Input Error",JOptionPane.ERROR_MESSAGE);
+                    }
+                    
                 } catch (NumberFormatException x) {
-                    JOptionPane.showMessageDialog(null,"Please input population", "Input Error",JOptionPane.ERROR_MESSAGE);
+                    if (inputPopulation.getText().equals("")) {
+                        JOptionPane.showMessageDialog(null,"Please enter the population", "Input Error",JOptionPane.ERROR_MESSAGE);
+                    }
+                    else
+                    {
+                        JOptionPane.showMessageDialog(null,"Please enter the population as an integer.", "Input Error",JOptionPane.ERROR_MESSAGE);
+                    } 
                 }
                 
             }
@@ -613,12 +663,25 @@ public class GamePanel extends JPanel{
             public void actionPerformed(ActionEvent e) {
                 try {
                     int population = Integer.parseInt(inputPopulation.getText());
-                    startGame(population,true);
+                    if (population>0) {
+                        startGame(population,true);
                     menuLayout.show(menuCard, "Event");
                     timeSystem.start();//เริ่มเวลาในเกมส์
                     stopEvent = false;
+                    }
+                    else
+                    {
+                        JOptionPane.showMessageDialog(null,"Please enter population from one or more.", "Input Error",JOptionPane.ERROR_MESSAGE);
+                    }
+                    
                 } catch (NumberFormatException x) {
-                    JOptionPane.showMessageDialog(null,"Please input the population range.", "Input Error",JOptionPane.ERROR_MESSAGE);
+                    if (inputPopulation.getText().equals("")) {
+                        JOptionPane.showMessageDialog(null,"Please enter the population range.", "Input Error",JOptionPane.ERROR_MESSAGE);
+                    }
+                    else
+                    {
+                        JOptionPane.showMessageDialog(null,"Please enter the population as an integer.", "Input Error",JOptionPane.ERROR_MESSAGE);
+                    } 
                 }
             }
             
@@ -771,7 +834,7 @@ public class GamePanel extends JPanel{
 
         // แปลง string แต่ละตัวเป็น int แล้วเก็บใน int array
         for (int i = 0; i < stringArray.length; i++) {
-            dustLevel[i] = Integer.parseInt(stringArray[i]);
+            dustLevel[i] = Float.parseFloat(stringArray[i]);
         }
 
         haveData();//เรียก Method เช็คว่ามีข้อมูลเข้ามายัง
@@ -1017,6 +1080,10 @@ public class GamePanel extends JPanel{
     } 
     public void rainEvent(){
         canRainny = false;
+        artIsEnabled = false;
+        for (int i = 0; i < populationฺBox.length; i++) {
+            populationฺBox[i].setCursor(checkInfoCursor);
+        }
         //เมื่อเวลาผ่านไป 2.5 วิ จะปิด Gif
         eventAnimation.setIcon(rainyIcon);
         repaint();

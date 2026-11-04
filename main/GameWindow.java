@@ -21,7 +21,6 @@ public class GameWindow extends JFrame {
 
     private ImageIcon gameImageIcon;
     public GameWindow(){
-
         menuPanel = new MenuPanel(this);
         gamePanel = new GamePanel(this);
         creatorPanel = new CreatorPanel(this);
