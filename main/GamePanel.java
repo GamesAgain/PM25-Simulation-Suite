@@ -96,7 +96,8 @@ public class GamePanel extends JPanel{
     JTextField inputPopulation;
 
     //กำหนดตัวแปร  Components ใน Method createEventComponent
-    ImageIcon nextIcon;
+    ImageIcon pauseIcon;
+    ImageIcon startIcon;
     ImageIcon planeIcon;
     ImageIcon rainIcon;
     JLabel dayText;
@@ -125,10 +126,20 @@ public class GamePanel extends JPanel{
     JLabel statusCard2;
     JLabel statusCard3;
     JLabel statusCard4;
+
+    //ส่วนของ Animation
+    JLabel eventAnimation;
+    ImageIcon staticIcon; //ตึกเปล่าๆ
+    ImageIcon artificialrainIconlIcon;
+    ImageIcon rainyIcon;
     
 
     
     File selectedFile;
+    int areaIndex;
+    boolean canRainny = true;//ทำให้ฝนตกได้หมด ทำไว้ให้มีดีเลย์ในการเรียกฝน
+    boolean isPause = false;
+
     public GamePanel(GameWindow gameWindow){
         //เพิ่มภาพลง Cursor
         checkInfoImage = new ImageIcon(getClass().getResource("/mouse/cursor/checkInfo.png")).getImage();
@@ -279,27 +290,19 @@ public class GamePanel extends JPanel{
     }
     //Method สร้าง Panel Event ใช้แสดงหน้า เหตุการณ์ต่างๆ เช่น ฝนเทียม,ฝนธรรมชาติ
     private void createEventPanel(){
-        JLabel artificialRainEventPanel = new JLabel(new ImageIcon(getClass().getResource("/image/tableType/planeEventGIF.gif")));
-        artificialRainEventPanel.setBounds(5, 5 , 860, 150);
+        staticIcon = new ImageIcon(getClass().getResource("/Event/StaticEvent.gif"));
+        artificialrainIconlIcon = new ImageIcon(getClass().getResource("/Event/PlaneEventGif.gif"));
+        rainyIcon = new ImageIcon(getClass().getResource("/Event/RainEventGif.gif"));
+        eventAnimation = new JLabel(staticIcon);//ตั้งให้เป็นภาพนิ่ง 
+        
+        eventAnimation.setBounds(5, 5 , 860, 150);
 
         eventPanel = new JPanel();
         eventPanel.setBounds(205, 563 , 870, 300);
         eventPanel.setLayout(null);
         eventPanel.setBackground(myLightGrey);
-        eventPanel.add(artificialRainEventPanel);
+        eventPanel.add(eventAnimation);
         add(eventPanel);
-
-        //เมื่อเวลาผ่านไป 2.5 วิ จะปิด Gif
-        Timer timer = new Timer(2500, new ActionListener() {
-            ImageIcon staticIcon = new ImageIcon(getClass().getResource("/image/planeEvent.png"));
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                artificialRainEventPanel.setIcon(staticIcon);
-            }
-            
-        });
-        timer.setRepeats(false); // ตั้งค่าให้ทำงานครั้งเดียว
-        timer.start();
     }
     //Method สร้าง Panel Control bar ด้านบนใช้ กลับไปหน้า Memu ขยาย/ย่อจอ และพับจอ
     private void createControlPanel(GameWindow gameWindow){
@@ -480,7 +483,8 @@ public class GamePanel extends JPanel{
     //สร้างองค์ประกอบภายใน Panel Event ปุ่มฝนเทียม,ปุ่มฝนธรรมชาติ,ปุ่มข้ามวัน,ตัวเลขแสดงวันและชั่วโมง
     private void createEventComponent(JLabel menuEvent){
 
-        nextIcon = new ImageIcon(getClass().getResource("/button/NextButton.png"));
+        pauseIcon = new ImageIcon(getClass().getResource("/button/PauseIcon.png"));
+        startIcon = new ImageIcon(getClass().getResource("/button/StartIcon.png"));
         planeIcon = new ImageIcon(getClass().getResource("/button/PlaneButton.png"));
         rainIcon = new ImageIcon(getClass().getResource("/button/RainnyButton.png"));
 
@@ -496,7 +500,7 @@ public class GamePanel extends JPanel{
         hourText.setFont(new SetFont().getFont(10f));
         hourText.setBounds(145, 55, 50, 30);
 
-        nextButton = new JButton(nextIcon);
+        nextButton = new JButton(pauseIcon);
         planeButton = new JButton(planeIcon);
         rainButton = new JButton(rainIcon);
 
@@ -515,6 +519,49 @@ public class GamePanel extends JPanel{
         menuEvent.add(rainButton);
         menuEvent.add(planeButton);
         menuEvent.add(nextButton);
+
+        rainButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (isPause) {
+                    if (canRainny) {
+                        rainEvent();
+                    }
+                    else
+                    {
+                        JOptionPane.showMessageDialog(null,"It's raining", "CD",JOptionPane.WARNING_MESSAGE);
+                    }
+                }
+                else
+                {
+                    JOptionPane.showMessageDialog(null,"Please PAUSE the time before USE Rainny Event.", "WARNING",JOptionPane.WARNING_MESSAGE);
+                }
+                
+                
+            }
+            
+        });
+
+        
+        nextButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (isPause) {
+                    isPause = false;
+                    timeSystem.start();
+                    nextButton.setIcon(pauseIcon);
+                }
+                else
+                {
+                    isPause = true;
+                    timeSystem.stop();
+                    nextButton.setIcon(startIcon);
+                }
+               
+            }
+            
+        });
     }
     private void createControlButton(GameWindow gameWindow){
         
@@ -620,7 +667,10 @@ public class GamePanel extends JPanel{
         });
     }
     private void openFile(){
-        JFileChooser fileChooser = new JFileChooser(); //เป็น Object ใช้เลือกไฟล์
+        //ดึงตำแหน่งที่อยู่ไฟล์ปัจจุบัน
+        String path = System.getProperty("user.dir");
+        File currentDir = new File(path);
+        JFileChooser fileChooser = new JFileChooser(currentDir); //เป็น Object ใช้เลือกไฟล์
                 int result = fileChooser.showOpenDialog(null);
                 if (result == JFileChooser.APPROVE_OPTION) {
                     selectedFile = fileChooser.getSelectedFile();
@@ -703,7 +753,8 @@ public class GamePanel extends JPanel{
                 percentArray[i]=0;
             }
         } catch (NullPointerException e) {
-            // TODO: handle exception
+
+
         }
         
     }
@@ -722,7 +773,7 @@ public class GamePanel extends JPanel{
                 populationArray[i]=population;
             }
         }
-        updateGame(populationArray);
+        paintGame(populationArray);
         for (int i = 0; i < populationฺBox.length; i++) {
             ImageIcon status = status0;
             if (statusShow[i].equals("0")) {
@@ -747,9 +798,13 @@ public class GamePanel extends JPanel{
             populationฺBox[i].setCursor(customCursor);
         }
     }
-    private void updateGame(int populationArray[]){
+    private void paintGame(int populationArray[]){
         String checkStatus = "0";
-       for (int i = 0; i < populationArray.length; i++) {
+        try {
+            
+        } catch (Exception e) {
+        }
+       for (int i = 0; i < populationฺBox.length; i++) {
         if (dustLevel[i] >= 0 && dustLevel[i] <= 50) {
             checkStatus = "1";
             int minPercentage = 0;//เปอร์เซ็นต์ต่ำสุด
@@ -823,7 +878,14 @@ public class GamePanel extends JPanel{
             });
         }
     }
+    private void setAreaIndex(int i){
+        this.areaIndex = i;
+    }
+    private int getAreaIndex(){
+        return this.areaIndex;
+    }
     private void showInfomation(int index){
+        setAreaIndex(index);
         areaText.setText(""+(index+1));
         dustText.setText(""+dustLevel[index]);
         populationText.setText(""+populationArray[index]);
@@ -831,6 +893,52 @@ public class GamePanel extends JPanel{
         patientText.setText(""+patientArray[index]);
         percentText.setText(""+percentArray[index]+"%");
         statusLayout.show(statusCard, statusShow[index]);
-        super.repaint();
+        repaint();
     } 
+    public void rainEvent(){
+        //เมื่อเวลาผ่านไป 2.5 วิ จะปิด Gif
+        eventAnimation.setIcon(rainyIcon);
+        canRainny = false;
+        Timer timer = new Timer(5500, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                eventAnimation.setIcon(staticIcon);
+                for (int i = 0; i < dustLevel.length; i++) {
+                    if (dustLevel[i]>0) {
+                        dustLevel[i]=dustLevel[i]-50;
+                    }
+                    if (dustLevel[i]<0) {
+                        dustLevel[i]=0;
+                    }
+                }
+                updateGame();
+                showInfomation(getAreaIndex());
+                canRainny = true;
+            }
+        });
+        timer.setRepeats(false); // ตั้งค่าให้ทำงานครั้งเดียว
+        timer.start();
+    }
+    public void updateGame(){
+        paintGame(populationArray);
+        for (int i = 0; i < populationฺBox.length; i++) {
+            ImageIcon status = status0;
+            if (statusShow[i].equals("0")) {
+                status = status0;
+            }
+            else if (statusShow[i].equals("1")) {
+                status = status1;
+            }
+            else if (statusShow[i].equals("2")) {
+                status = status2;
+            }
+            else if (statusShow[i].equals("3")) {
+                status = status3;
+            }
+            else if (statusShow[i].equals("4")) {
+                status = status4;
+            }
+            populationฺBox[i].setIcon(status);
+        }
+    }
 }

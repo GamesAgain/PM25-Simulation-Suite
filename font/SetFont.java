@@ -3,11 +3,11 @@ package font;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.io.IOException;
-
-
+import java.io.InputStream;
 import java.io.File;
 
 public class SetFont {
+    InputStream fontPath = getClass().getResourceAsStream("/font/VeniteAdoremus-rgRBA.ttf");
     public SetFont(){
        
     }
@@ -36,7 +36,7 @@ public class SetFont {
     public Font getFont(float size){
         try {
             // โหลดฟอนต์จากไฟล์
-            Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File("font\\VeniteAdoremus-rgRBA.ttf")).deriveFont(size);
+            Font customFont = Font.createFont(Font.TRUETYPE_FONT,fontPath).deriveFont(size);
             return customFont;
             
         } catch (IOException | FontFormatException e) {
@@ -47,7 +47,7 @@ public class SetFont {
     public Font getFont(){
         try {
             // โหลดฟอนต์จากไฟล์
-            Font customFont = Font.createFont(Font.TRUETYPE_FONT, new File("font\\VeniteAdoremus-rgRBA.ttf")).deriveFont(32f);
+            Font customFont = Font.createFont(Font.TRUETYPE_FONT, fontPath).deriveFont(32f);
             return customFont;
             
         } catch (IOException | FontFormatException e) {
