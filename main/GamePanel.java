@@ -539,7 +539,7 @@ public class GamePanel extends JPanel{
                 }
                 else
                 {
-                    JOptionPane.showMessageDialog(null,"Please STOP to START Again", "Warning",JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(null,"Please STOP to OPEN FILE Again", "Warning",JOptionPane.WARNING_MESSAGE);
                 }
                 
             }
@@ -562,7 +562,7 @@ public class GamePanel extends JPanel{
                 }
                 else
                 {
-                    JOptionPane.showMessageDialog(null,"Please STOP to START Again", "Warning",JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(null,"Please STOP to SIMULATE Again", "Warning",JOptionPane.WARNING_MESSAGE);
                 }
                 
                 
@@ -797,7 +797,7 @@ public class GamePanel extends JPanel{
     private void openFile(){
         //ดึงตำแหน่งที่อยู่ไฟล์ปัจจุบัน
         JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir")); //เป็น Object ใช้เลือกไฟล์
-                int result = fileChooser.showOpenDialog(null);
+                int result = fileChooser.showOpenDialog(this);
                 if (result == JFileChooser.APPROVE_OPTION) {
                     selectedFile = fileChooser.getSelectedFile();
                     if (selectedFile.getName().endsWith(".txt")) {//เช็คว่าใช่ไฟล์ สกุล .txt ไหม
@@ -934,7 +934,8 @@ public class GamePanel extends JPanel{
             }
         }
         paintGame(populationArray);
-        for (int i = 0; i < dustLevel.length; i++) {
+        try {
+            for (int i = 0; i < dustLevel.length; i++) {
             ImageIcon status = status0;
             try {
                 if (statusShow[i].equals("0")) {
@@ -959,6 +960,11 @@ public class GamePanel extends JPanel{
             populationฺBox[i].setBorderPainted(false);
             populationฺBox[i].setFocusPainted(false);
         }
+        } catch (ArrayIndexOutOfBoundsException e) {
+            //ข้อมูลเกิน 200
+            System.out.println("ข้อมูลเกิน 200 ปุ่ม");
+        }
+        
     }
     private void paintGame(float populationArray[]){
         String checkStatus = "0";
@@ -1066,7 +1072,14 @@ public class GamePanel extends JPanel{
             healthyText.setText(""+(int)healthyArray[index]);
             patientText.setText(""+(int)patientArray[index]);
             percentText.setText(""+(int)percentArray[index]+"%");
-            statusLayout.show(statusCard, statusShow[index]);
+            if (dustLevel[index]>=0&&dustLevel[index]<=250) {
+                statusLayout.show(statusCard, statusShow[index]);
+            }
+            else
+            {
+                statusLayout.show(statusCard, "0");
+            }
+            
         } catch (ArrayIndexOutOfBoundsException e) {
             dustText.setText("null");
             populationText.setText("null");

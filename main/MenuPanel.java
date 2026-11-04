@@ -16,7 +16,7 @@ import javax.swing.JPanel;
 public class MenuPanel extends JPanel{
 
     //สร้าง Object รูปภาพพื้นหลัง
-    private ImageIcon backgroundImageIcon = new ImageIcon("image\\MenuBG.png");
+    private ImageIcon backgroundImageIcon = new ImageIcon(getClass().getResource("/image/MenuBG.png"));
     private Image backgroundImage = backgroundImageIcon.getImage();
     
     //กำหนดตัวแปร Button
@@ -119,7 +119,7 @@ public class MenuPanel extends JPanel{
 
     //Method สร้างปุ่ม
     private void creatorButton(){
-        String fontPath = "font\\punk kid.ttf";
+        String fontPath = "/font/punk kid.ttf";
          //สร้าง Object Panel
        startButtonPanel = new MyButtonPanel("Start",true);
        creatorButtonPanel = new MyButtonPanel("Creator",true);
