@@ -556,7 +556,6 @@ public class GamePanel extends JPanel{
                         readFile(selectedFile);
                         menuLayout.show(menuCard, "Input");//โชว์หน้า Input
                         isStarted=true;
-                        stopEvent = false;
                     }
                     else
                     {
@@ -610,6 +609,7 @@ public class GamePanel extends JPanel{
                     startGame(population,false);
                     menuLayout.show(menuCard, "Event");
                     timeSystem.start();//เริ่มเวลาในเกมส์
+                    stopEvent = false;
                 } catch (NumberFormatException x) {
                     JOptionPane.showMessageDialog(null,"Please input population", "Input Error",JOptionPane.ERROR_MESSAGE);
                 }
@@ -625,6 +625,7 @@ public class GamePanel extends JPanel{
                     startGame(population,true);
                     menuLayout.show(menuCard, "Event");
                     timeSystem.start();//เริ่มเวลาในเกมส์
+                    stopEvent = false;
                 } catch (NumberFormatException x) {
                     JOptionPane.showMessageDialog(null,"Please input the population range.", "Input Error",JOptionPane.ERROR_MESSAGE);
                 }
@@ -807,7 +808,17 @@ public class GamePanel extends JPanel{
     }
     public void restartGame(){
         stopEvent = true;
-        //กำหนดเป็นค่าเริ่มต้น
+        if (planeAnimTimer!=null) {
+            if (planeAnimTimer.isRunning()) {
+                planeAnimTimer.stop();
+            }
+        }
+        if (rainAnimTimer!=null) {
+            if (rainAnimTimer.isRunning()) {
+                rainAnimTimer.stop();
+            }
+        }
+        //กำหนดเป็นค่าเริ่มต้น 
         canRainny = true;
         canPlaneEvent = true;
         isPause = false;
@@ -1012,38 +1023,29 @@ public class GamePanel extends JPanel{
         rainAnimTimer.start();
     }
     private void planeEvent(int index){
-        Color color = Color.GREEN;
+        final int GRID_WIDTH = 20;  // จำนวนคอลัมน์
+        final int GRID_HEIGHT = 10; // จำนวนแถว
+        final Color SELECTED_COLOR = Color.CYAN;
+        final Color NEIGHBOR_COLOR = Color.GREEN;
         eventAnimation.setIcon(artificialrainIconlIcon);
-        if (index-21>=0&&index-21<=199) {
-            populationฺBox[index-21].setBackground(color);
-        }
-        if (index-20>=0&&index-20<=199) {
-            populationฺBox[index-20].setBackground(color);
-        }
-        if (index-19>=0&&index-19<=199) {
-            populationฺBox[index-19].setBackground(color);
-        }
-        
+        int x = index % GRID_WIDTH;
+        int y = index / GRID_WIDTH;
 
-        // 3 ตัวตรงกลาง 
-        if (index-1>=0&&index-1<=199) {
-            populationฺBox[index-1].setBackground(color);
-        }
-        populationฺBox[index].setBackground(Color.CYAN); //ตัวที่กดเครื่องบินใส่
-        if (index+1>=0&&index+1<=199) {
-            populationฺBox[index+1].setBackground(color);
+        populationฺBox[index].setBackground(SELECTED_COLOR);//ตัวปุ่มที่กด
+        for (int dy = -1; dy <= 1; dy++) {
+            for (int dx = -1; dx <= 1; dx++) {
+                if (dx == 0 && dy == 0) continue;
+
+                int nx = x + dx;
+                int ny = y + dy;
+
+                if (nx >= 0 && nx < GRID_WIDTH && ny >= 0 && ny < GRID_HEIGHT) {
+                    int neighborIndex = ny * GRID_WIDTH + nx;
+                    populationฺBox[neighborIndex].setBackground(NEIGHBOR_COLOR);//ตัวปุ่มรอบๆ 
+                }
+            }
         }
 
-            // 3 ตัวด้านล่าง
-        if (index+19>=0&&index+19<=199) {
-            populationฺBox[index+19].setBackground(color);
-        }
-        if (index+20>=0&&index+20<=199) {
-            populationฺBox[index+20].setBackground(color);
-        }
-        if (index+21>=0&&index+21<=199) {
-            populationฺBox[index+21].setBackground(color);
-        }
         for (int i = 0; i < populationฺBox.length; i++) {
             populationฺBox[i].setCursor(checkInfoCursor);
         }
@@ -1055,59 +1057,32 @@ public class GamePanel extends JPanel{
             public void actionPerformed(ActionEvent e) {
                 if (!stopEvent) {
                     eventAnimation.setIcon(staticIcon);
-                //3 ตัวบน
-                    if (index-21>=0&&index-21<=199) {
-                        dustLevel[index-21] = dustLevel[index-21]-(dustLevel[index-21]*30/100);
-                        populationฺBox[index-21].setBackground(myDarkGrey);
-                    }
-                    if (index-20>=0&&index-20<=199) {
-                        dustLevel[index-20] = dustLevel[index-20]-(dustLevel[index-20]*30/100);
-                        populationฺBox[index-20].setBackground(myDarkGrey);
-                    }
-                    if (index-19>=0&&index-19<=199) {
-                        dustLevel[index-19] = dustLevel[index-19]-(dustLevel[index-19]*30/100);
-                        populationฺBox[index-19].setBackground(myDarkGrey);
-                    }
-                    
-
-                    // 3 ตัวตรงกลาง 
-                    if (index-1>=0&&index-1<=199) {
-                        dustLevel[index-1] = dustLevel[index-1]-(dustLevel[index-1]*30/100);
-                        populationฺBox[index-1].setBackground(myDarkGrey);
-                    }
-                    dustLevel[index] = dustLevel[index]-(dustLevel[index]*50/100); //ตัวที่กดเครื่องบินใส่
+                    dustLevel[index] = dustLevel[index]-(dustLevel[index]*50/100); //ปุ่มที่กดลด 50%
                     populationฺBox[index].setBackground(myDarkGrey);
-                    if (index+1>=0&&index+1<=199) {
-                            dustLevel[index+1] = dustLevel[index+1]-(dustLevel[index+1]*30/100);
-                            populationฺBox[index+1].setBackground(myDarkGrey);
-                    }
+                    for (int dy = -1; dy <= 1; dy++) {
+                        for (int dx = -1; dx <= 1; dx++) {
+                            if (dx == 0 && dy == 0) continue;
 
-                    // 3 ตัวด้านล่าง
-                    if (index+19>=0&&index+19<=199) {
-                        dustLevel[index+19] = dustLevel[index+19]-(dustLevel[index+19]*30/100);
-                        populationฺBox[index+19].setBackground(myDarkGrey);
-                    }
-                    if (index+20>=0&&index+20<=199) {
-                        dustLevel[index+20] = dustLevel[index+20]-(dustLevel[index+20]*30/100);
-                        populationฺBox[index+20].setBackground(myDarkGrey);
-                    }
-                    if (index+21>=0&&index+21<=199) {
-                        dustLevel[index+21] = dustLevel[index+21]-(dustLevel[index+21]*30/100);
-                        populationฺBox[index+21].setBackground(myDarkGrey);
+                            int nx = x + dx;
+                            int ny = y + dy;
+
+                            if (nx >= 0 && nx < GRID_WIDTH && ny >= 0 && ny < GRID_HEIGHT) {
+                                int neighborIndex = ny * GRID_WIDTH + nx;
+                                dustLevel[neighborIndex] = dustLevel[neighborIndex]-(dustLevel[neighborIndex]*30/100);//ปุ่มรอบๆลด 30%
+                                populationฺBox[neighborIndex].setBackground(myDarkGrey);
+                            }
+                        }
                     }
                     tablePanel.revalidate();
                     tablePanel.repaint();
                     updateGame();
                     showInfomation(getAreaIndex());
                     canPlaneEvent = true;
-                    System.out.println("RADASDA");
                 }
-                
             }
         });
         planeAnimTimer.setRepeats(false);// ตั้งค่าให้ทำงานครั้งเดียว
         planeAnimTimer.start();
-        
     }
     public void updateGame(){
         paintGame(populationArray);
