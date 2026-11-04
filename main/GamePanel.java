@@ -85,7 +85,7 @@ public class GamePanel extends JPanel{
     private String statusShow[];
     private JButton populationฺBox[];
     private float dustLevel[];
-    private float populationArray[];
+    private int populationArray[];
     private float healthyArray[];
     private float patientArray[];
     private float percentArray[];
@@ -511,28 +511,61 @@ public class GamePanel extends JPanel{
         randomButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    int population = Integer.parseInt(inputPopulation.getText());
-                    if (population>0) {
-                        startGame(population,true);
-                    menuLayout.show(menuCard, "Event");
-                    timeSystem.start();//เริ่มเวลาในเกมส์
-                    stopEvent = false;
-                    }
-                    else
-                    {
-                        JOptionPane.showMessageDialog(null,"Please enter population from one or more.", "Input Error",JOptionPane.ERROR_MESSAGE);
-                    }
-                    
-                } catch (NumberFormatException x) {
-                    if (inputPopulation.getText().equals("")) {
-                        JOptionPane.showMessageDialog(null,"Please enter the population range.", "Input Error",JOptionPane.ERROR_MESSAGE);
-                    }
-                    else
-                    {
+                Random random = new Random();
+                int max=0;
+                int min=0;
+                String inMin="0";
+                String inMax="0";
+                do {
+                    try {
+                        inMin = JOptionPane.showInputDialog(null,"Set the starting point :","Please define the population range.",JOptionPane.QUESTION_MESSAGE);
+                        if (inMin==null) {
+                            break;
+                        }
+                        min=Integer.parseInt(inMin);
+                        if (min>0) {
+                            do {
+                                try {
+                                    inMax = JOptionPane.showInputDialog(null,"Set the ending point :","Please define the population range.",JOptionPane.QUESTION_MESSAGE);
+                                    if (inMax==null) {
+                                        break;
+                                    }
+                                    max=Integer.parseInt(inMax);
+                                    if (max>0) {
+                                        if (max>=min) {
+                                            for (int i = 0; i < dustLevel.length; i++) {
+                                                populationArray[i]=random.nextInt(max - min + 1) + min;
+                                            }
+                                            startGame(0,true);
+                                            menuLayout.show(menuCard, "Event");
+                                            timeSystem.start();//เริ่มเวลาในเกมส์
+                                            stopEvent = false;
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            JOptionPane.showMessageDialog(null,"The ending point should be more than the starting point.", "Input Error",JOptionPane.ERROR_MESSAGE);
+                                            break;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        JOptionPane.showMessageDialog(null,"Please enter population from one or more.", "Input Error",JOptionPane.ERROR_MESSAGE);
+                                    }
+                                } catch (NumberFormatException x) {
+                                    JOptionPane.showMessageDialog(null,"Please enter the population as an integer.", "Input Error",JOptionPane.ERROR_MESSAGE);
+                                }
+                            } while (inMax!=null);
+                            break;
+                        }
+                        else
+                        {
+                            JOptionPane.showMessageDialog(null,"Please enter population from one or more.", "Input Error",JOptionPane.ERROR_MESSAGE);
+                        }
+                    } catch (NumberFormatException x) {
                         JOptionPane.showMessageDialog(null,"Please enter the population as an integer.", "Input Error",JOptionPane.ERROR_MESSAGE);
-                    } 
-                }
+                    }
+                } while (inMin!=null);
             }
             
         });
@@ -676,6 +709,14 @@ public class GamePanel extends JPanel{
     }
     private void saveData(String data){
         try {
+            statusShow = new String[dustLevel.length];
+            populationArray = new int[dustLevel.length];
+            healthyArray = new float[dustLevel.length];
+            patientArray = new float[dustLevel.length];
+            percentArray = new float[dustLevel.length];
+        } catch (NullPointerException e) {}
+
+        try {
             selectFileText.setText(selectedFile.getName());
             String[] stringArray = data.split("\\s+");
 
@@ -762,23 +803,8 @@ public class GamePanel extends JPanel{
     //Method เริ่มการจำลอง
     private void startGame(int population,boolean isRandom){ 
         //สร้าง object Array ค่าต่างๆภายในเกมส์
-        try {
-            statusShow = new String[dustLevel.length];
-            populationArray = new float[dustLevel.length];
-            healthyArray = new float[dustLevel.length];
-            patientArray = new float[dustLevel.length];
-            percentArray = new float[dustLevel.length];
-        } catch (NullPointerException e) {}
-        
 
-        Random random = new Random();
-        if (isRandom) {
-            for (int i = 0; i < dustLevel.length; i++) {
-                populationArray[i]=random.nextInt(population);
-            }
-        }
-        else
-        {
+        if (!isRandom) {
             for (int i = 0; i < dustLevel.length; i++) {
                 populationArray[i]=population;
             }
@@ -816,7 +842,7 @@ public class GamePanel extends JPanel{
         }
         
     }
-    private void paintGame(float populationArray[]){
+    private void paintGame(int populationArray[]){
         String checkStatus = "0";
         try {
             
