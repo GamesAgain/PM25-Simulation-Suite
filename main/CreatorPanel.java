@@ -8,7 +8,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class CreatorPanel extends JPanel{
-    public CreatorPanel(){
+    public CreatorPanel(GameWindow gameWindow){
+        ControlBar controlBar = new ControlBar(gameWindow);
         JLabel t1 = new JLabel(new ImageIcon("Creator\\FARM.gif"));
         JLabel t2 = new JLabel(new ImageIcon("Creator\\SARAYUTGAMES.png"));
         JLabel t3 = new JLabel(new ImageIcon("Creator\\SKYWAVE101.gif"));
@@ -20,6 +21,7 @@ public class CreatorPanel extends JPanel{
         add(t1);
         add(t2);
         add(t3);
+        add(controlBar);
     }
 
     @Override

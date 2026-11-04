@@ -2,11 +2,16 @@ package main;
 
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class MenuPanel extends JPanel{
@@ -25,15 +30,76 @@ public class MenuPanel extends JPanel{
     private JButton startButton;
     private JButton creatorButton;
     private JButton exitButton;
-    private JButton setMinMaxButton;
+
+    private ControlBar controlBar;
     
     public MenuPanel(GameWindow gameWindow){
+        controlBar = new ControlBar(gameWindow,true);
         setLayout(null);
         creatorButton();
         add(startButtonPanel);
         add(creatorButtonPanel);
         add(exitButtonPanel);
-        add(setMinMaxPanel);
+        add(controlBar);
+
+        startButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                gameWindow.showGamePanel();
+            }
+            
+        });
+        startButton.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                buttonMovement(startButton,startButtonPanel,true);
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                buttonMovement(startButton,startButtonPanel,false);
+            }
+        });
+
+        creatorButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                gameWindow.showCreatorPanel();
+            }
+            
+        });
+        creatorButton.addMouseListener(new MouseAdapter() {
+           
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                buttonMovement(creatorButton,creatorButtonPanel,true);
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                buttonMovement(creatorButton,creatorButtonPanel,false);
+            }
+        });
+
+        exitButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+            
+        });
+        exitButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                buttonMovement(exitButton,exitButtonPanel,true);
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                buttonMovement(exitButton,exitButtonPanel,false);
+            }
+        });
 
         //เพิ่ม ComponentListener ดักจับการ Resized ของ Component
         addComponentListener(new ComponentAdapter() {
@@ -65,19 +131,11 @@ public class MenuPanel extends JPanel{
        startButton = startButtonPanel.getButton();
        creatorButton = creatorButtonPanel.getButton();
        exitButton = exitButtonPanel.getButton();
-       setMinMaxButton = setMinMaxPanel.getButton();
-       setMinMaxPanel.setBounds(1225, 5, 47, 47);
-       setMinMaxButton.setBounds(0, 0, 45, 45);
        
         //กำหนด Font ของ Button
        startButtonPanel.setFont(fontPath);
        creatorButtonPanel.setFont(fontPath);
        exitButtonPanel.setFont(fontPath);
-       
-       
-       
-
-     
     }
 
     //Method ปรับขนาด Components ให้เหมาะสมกับขนาดหน้าจอ
@@ -105,4 +163,18 @@ public class MenuPanel extends JPanel{
         creatorButton.setBounds(0, 0, buttonWidth, buttonHeight);
         exitButton.setBounds(0, 0, buttonWidth, buttonHeight);
     }
+    private void buttonMovement(JButton button,JPanel panel,boolean check){
+        int s=10;
+            int l=5;
+        if (check) {
+            button.setBounds(button.getX()-l,button.getY()-l,button.getWidth()+s, button.getHeight()+s);
+            panel.setBounds(panel.getX()-l,panel.getY()-l,panel.getWidth()+s, panel.getHeight()+s);
+        }
+        else
+        {
+            button.setBounds(button.getX()+l,button.getY()+l,button.getWidth()-s, button.getHeight()-s);
+            panel.setBounds(panel.getX()+l,panel.getY()+l,panel.getWidth()-s, panel.getHeight()-s);
+        }
+    }
+    
 }

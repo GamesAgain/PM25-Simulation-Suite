@@ -10,7 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class GameWindow extends JFrame {
-    private boolean isMaximized;
+    public boolean isMaximized;
     public int width= 1280,height=720;
     private JPanel mainPanel;
     private CardLayout cardLayout;
@@ -24,7 +24,7 @@ public class GameWindow extends JFrame {
 
         menuPanel = new MenuPanel(this);
         gamePanel = new GamePanel(this);
-        creatorPanel = new CreatorPanel();
+        creatorPanel = new CreatorPanel(this);
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
         mainPanel.add(menuPanel,"Menu");
@@ -38,7 +38,7 @@ public class GameWindow extends JFrame {
         setIconImage(getIconImage());
         setFocusable(true);
         add(mainPanel); 
-        showGamePanel();
+        showMenuPanel();
 
         //ปรับขนาดจอ
         isMaximized = isMaximumSizeSet();
@@ -61,6 +61,10 @@ public class GameWindow extends JFrame {
 
     public void showMenuPanel(){
         cardLayout.show(mainPanel, "Menu");
+    }
+
+    public void showCreatorPanel(){
+        cardLayout.show(mainPanel, "Creator");
     }
 
     @Override

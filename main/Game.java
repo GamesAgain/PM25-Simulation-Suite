@@ -1,16 +1,9 @@
 package main;
 
-public class Game extends Thread{
+public class Game {
     private GameWindow gameWindow;
     public Game(){
         gameWindow = new GameWindow();
         gameWindow.setVisible(true);
-    }
-    @Override
-    public void run() {
-        while (true) {
-            this.start();
-        }
-        
     }
 }

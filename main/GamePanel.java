@@ -12,8 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -23,7 +21,6 @@ import java.util.Random;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -33,15 +30,12 @@ import javax.swing.Timer;
 import font.SetFont;
 
 public class GamePanel extends JPanel{
-    private GameWindow gameWindow;
     private TimeSystem timeSystem;
 
     private boolean isStarted = false;//เช็คว่าเกมส์เริ่มอย่ไหม
     private Image checkInfoImage;
     private Cursor checkInfoCursor;
     private Cursor planeCursor;
-    private boolean isMaximized = false;
-
 
     //กำหนดตัวแปร ปุ่มสถานะ
     private ImageIcon status0;
@@ -71,7 +65,7 @@ public class GamePanel extends JPanel{
     private JPanel tablePanel;
     private JPanel menuPanel;
     private JPanel eventPanel;
-    private JPanel controlPanel;
+    private ControlBar controlPanel;
 
     //กำหนดตัวแปร Button และ TextArea ของปุ่ม ใน MenuPanel
     private ImageIcon openFileIcon;
@@ -97,10 +91,6 @@ public class GamePanel extends JPanel{
     private JButton rainButton;
     private CardLayout menuLayout;
     private JPanel menuCard;
-    //กำหนดตัวแปร Button ใน ControlPanel
-    private JButton exitButton;
-    private JButton setMinMaxButton;
-    private JButton hideWindowButton;
 
     //กำหนดตัวแปร Array ของ ปุ่มประชากรแต่พื้นที่
     private String statusShow[];
@@ -162,10 +152,9 @@ public class GamePanel extends JPanel{
     public boolean canRainny = true;//ทำให้ฝนตกได้หมด ทำไว้ให้มีดีเลย์ในการเรียกฝน
     public boolean canPlaneEvent = true;//ฝนเทียมติดคลูดาวน์ไหม
     private boolean isPause = false;
-    private boolean artIsEnabled = false;
+    public boolean artIsEnabled = false;
 
     public GamePanel(GameWindow gameWindow){
-        this.gameWindow = gameWindow;
         //เพิ่มภาพลง Cursor
         checkInfoImage = new ImageIcon(getClass().getResource("/mouse/cursor/checkInfo.png")).getImage();
         checkInfoCursor = Toolkit.getDefaultToolkit().createCustomCursor(checkInfoImage, new Point(0, 0), "custom cursor");
@@ -208,7 +197,6 @@ public class GamePanel extends JPanel{
 
         //สร้าง Button
         createMenuButton(); //สร้าง ปุ่มที่หน้า Menu ฝั่งขวา
-        createControlButton(gameWindow); //สร้างปุ่มให้ Control Bar ด้านบน
 
         setStartGame();//ตั้งค่า Default ของ Game
         populationฺButtonAction(); //เพิ่ม Action ให้ปุ่ม
@@ -219,6 +207,7 @@ public class GamePanel extends JPanel{
         gameWindow.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
+
                 int frameWidth = gameWindow.getWidth();
                 int frameHeight = gameWindow.getHeight();
                 
@@ -245,13 +234,6 @@ public class GamePanel extends JPanel{
                 int newEventY = newTableY + newTableHeight + gap; // ให้ eventPanel อยู่ถัดจาก tablePanel
                 int newEventHeight = frameHeight - newEventY; // ความสูงเต็มที่เหลือ
                 eventPanel.setBounds(newTableX, newEventY, newTableWidth, newEventHeight);
-                
-                controlPanel.setBounds(0, 0, frameWidth, 30); // ความกว้างเต็มหน้าจอ, ความสูง 30
-                
-                // ปรับขนาดและตำแหน่งของปุ่มใน controlPanel
-                exitButton.setBounds(frameWidth - 50, 0, 50, 30);
-                setMinMaxButton.setBounds(frameWidth - 100, 0, 50, 30);
-                hideWindowButton.setBounds(frameWidth - 150, 0, 50, 30);
 
                 // ปรับขนาดและตำแหน่งของ components ใน infoJPanel
                 textJLabel.setBounds(5, 5, infoJPanel.getWidth() - 10, (int)(infoJPanel.getHeight() / 2));
@@ -280,7 +262,7 @@ public class GamePanel extends JPanel{
                 // ปรับขนาดและตำแหน่งของ eventAnimation ใน eventPanel
                 eventAnimation.setBounds(5, 5, eventPanel.getWidth() - 10, (int)(eventPanel.getHeight() * 0.93));
                 menuCard.setBounds(5, 300, newMenuWidth - 10, newMenuHeight - 300 - 10); // ปรับขนาด menuCard
-                if (isMaximized) {
+                if (gameWindow.isMaximized) {
                     //ปรับขนาดเล็กในหมวดของ MenuCard
                     //InputEvent
                     menuInput.setIcon(inputIconM);
@@ -472,10 +454,7 @@ public class GamePanel extends JPanel{
     }
     //Method สร้าง Panel Control bar ด้านบนใช้ กลับไปหน้า Memu ขยาย/ย่อจอ และพับจอ
     private void createControlPanel(GameWindow gameWindow){
-        controlPanel = new JPanel();
-        controlPanel.setLayout(null);
-        controlPanel.setBounds(0, 0,getWidth(), 30);
-        controlPanel.setBackground(new Color(57, 68, 76));
+        controlPanel = new ControlBar(gameWindow);
         add(controlPanel);
     }
     //Method ใส่ Background
@@ -758,109 +737,6 @@ public class GamePanel extends JPanel{
             
         });
     }
-    private void createControlButton(GameWindow gameWindow){
-        
-        JLabel gameName = new JLabel("PM2.5 Simulation Suite");
-        gameName.setBounds(10, 0,500,30);
-        gameName.setForeground(Color.WHITE);
-        gameName.setFont(new SetFont().getFont(12f));
-
-        exitButton = new JButton("✖");
-        exitButton.setBounds(1230,0,50,30);
-        exitButton.setBorderPainted(false);
-        exitButton.setFocusPainted(false);
-        exitButton.setBackground(myDarkGrey);
-        exitButton.setForeground(Color.WHITE);
-
-        setMinMaxButton = new JButton("❑");
-        setMinMaxButton.setBounds(1180,0,50,30);
-        setMinMaxButton.setBorderPainted(false);
-        setMinMaxButton.setFocusPainted(false);
-        setMinMaxButton.setBackground(myDarkGrey);
-        setMinMaxButton.setForeground(Color.WHITE);
-
-        hideWindowButton = new JButton("━");
-        hideWindowButton.setBounds(1130,0,50,30);
-        hideWindowButton.setBorderPainted(false);
-        hideWindowButton.setFocusPainted(false);
-        hideWindowButton.setBackground(myDarkGrey);
-        hideWindowButton.setForeground(Color.WHITE);
-
-        controlPanel.add(gameName);
-        controlPanel.add(exitButton);
-        controlPanel.add(setMinMaxButton);
-        controlPanel.add(hideWindowButton);
-
-        //เมื่อกดปุ่ม "━" พักหน้าโปรแกรมไว้
-        hideWindowButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                hideWindowButton.setBackground(Color.BLUE);
-            }
-            @Override
-            public void mouseExited(MouseEvent e) {
-                hideWindowButton.setBackground(myDarkGrey);
-            }
-        });
-
-        hideWindowButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                gameWindow.setExtendedState(JFrame.ICONIFIED);
-            }
-            
-        });
-
-        //เมื่อกดปุ่ม "❑" จะปรับลด/ขยาย
-        setMinMaxButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                setMinMaxButton.setBackground(Color.GREEN);
-            }
-            @Override
-            public void mouseExited(MouseEvent e) {
-                setMinMaxButton.setBackground(myDarkGrey);
-            }
-        });
-        setMinMaxButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (isMaximized) {
-                    gameWindow.setNormalScreen();
-                    setMinMaxButton.setText("❐");
-                }
-                else
-                {
-                    gameWindow.setMaxScreen();
-                    setMinMaxButton.setText("❑");
-                }
-                isMaximized = !isMaximized;
-            }
-            
-        });
-
-        //เมื่อกดปุ่ม "✖" จะกลับไปหน้า Menu(หน้าแรก)
-        exitButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                exitButton.setBackground(Color.RED);
-            }
-            @Override
-            public void mouseExited(MouseEvent e) {
-                exitButton.setBackground(myDarkGrey);
-            }
-        });
-        exitButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                gameWindow.showMenuPanel();
-            }
-            
-        });
-    }
     private void openFile(){
         //ดึงตำแหน่งที่อยู่ไฟล์ปัจจุบัน
         JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir")); //เป็น Object ใช้เลือกไฟล์
@@ -1098,10 +974,10 @@ public class GamePanel extends JPanel{
         repaint();
     } 
     public void rainEvent(){
+        canRainny = false;
         //เมื่อเวลาผ่านไป 2.5 วิ จะปิด Gif
         eventAnimation.setIcon(rainyIcon);
         repaint();
-        canRainny = false;
         Timer timer = new Timer(5500, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -1123,10 +999,42 @@ public class GamePanel extends JPanel{
         timer.start();
     }
     private void planeEvent(int index){
+        Color color = Color.GREEN;
+        if (index-21>=0&&index-21<=199) {
+            populationฺBox[index-21].setBackground(color);
+        }
+        if (index-20>=0&&index-20<=199) {
+            populationฺBox[index-20].setBackground(color);
+        }
+        if (index-19>=0&&index-19<=199) {
+            populationฺBox[index-19].setBackground(color);
+        }
+        
+
+        // 3 ตัวตรงกลาง 
+        if (index-1>=0&&index-1<=199) {
+            populationฺBox[index-1].setBackground(color);
+        }
+        populationฺBox[index].setBackground(Color.CYAN); //ตัวที่กดเครื่องบินใส่
+        if (index+1>=0&&index+1<=199) {
+            populationฺBox[index+1].setBackground(color);
+        }
+
+            // 3 ตัวด้านล่าง
+        if (index+19>=0&&index+19<=199) {
+            populationฺBox[index+19].setBackground(color);
+        }
+        if (index+20>=0&&index+20<=199) {
+            populationฺBox[index+20].setBackground(color);
+        }
+        if (index+21>=0&&index+21<=199) {
+            populationฺBox[index+21].setBackground(color);
+        }
         eventAnimation.setIcon(artificialrainIconlIcon);
         for (int i = 0; i < populationฺBox.length; i++) {
             populationฺBox[i].setCursor(checkInfoCursor);
         }
+
         repaint();
         canPlaneEvent = false;
         Timer timer = new Timer(8000, new ActionListener() {
@@ -1136,35 +1044,45 @@ public class GamePanel extends JPanel{
                 //3 ตัวบน
                 if (index-21>=0&&index-21<=199) {
                     dustLevel[index-21] = dustLevel[index-21]-(dustLevel[index-21]*30/100);
+                    populationฺBox[index-21].setBackground(myDarkGrey);
                 }
                 if (index-20>=0&&index-20<=199) {
                      dustLevel[index-20] = dustLevel[index-20]-(dustLevel[index-20]*30/100);
+                     populationฺBox[index-20].setBackground(myDarkGrey);
                 }
                 if (index-19>=0&&index-19<=199) {
                     dustLevel[index-19] = dustLevel[index-19]-(dustLevel[index-19]*30/100);
+                    populationฺBox[index-19].setBackground(myDarkGrey);
                 }
-                if (index-21>=0&&index-21<=199) {
-                    dustLevel[index-21] = dustLevel[index-21]-(dustLevel[index-21]*30/100);
-                }
+                
 
                 // 3 ตัวตรงกลาง 
                 if (index-1>=0&&index-1<=199) {
                     dustLevel[index-1] = dustLevel[index-1]-(dustLevel[index-1]*30/100);
+                    populationฺBox[index-1].setBackground(myDarkGrey);
                 }
-                    dustLevel[index] = dustLevel[index]-(dustLevel[index]*50/100); //ตัวที่กดเครื่องบินใส่
+                dustLevel[index] = dustLevel[index]-(dustLevel[index]*50/100); //ตัวที่กดเครื่องบินใส่
+                populationฺBox[index].setBackground(myDarkGrey);
                 if (index+1>=0&&index+1<=199) {
                         dustLevel[index+1] = dustLevel[index+1]-(dustLevel[index+1]*30/100);
+                        populationฺBox[index+1].setBackground(myDarkGrey);
                 }
+
                  // 3 ตัวด้านล่าง
                 if (index+19>=0&&index+19<=199) {
                     dustLevel[index+19] = dustLevel[index+19]-(dustLevel[index+19]*30/100);
+                    populationฺBox[index+19].setBackground(myDarkGrey);
                 }
                 if (index+20>=0&&index+20<=199) {
                     dustLevel[index+20] = dustLevel[index+20]-(dustLevel[index+20]*30/100);
+                    populationฺBox[index+20].setBackground(myDarkGrey);
                 }
                 if (index+21>=0&&index+21<=199) {
                     dustLevel[index+21] = dustLevel[index+21]-(dustLevel[index+21]*30/100);
+                    populationฺBox[index+21].setBackground(myDarkGrey);
                 }
+                tablePanel.revalidate();
+                tablePanel.repaint();
                 updateGame();
                 showInfomation(getAreaIndex());
                 canPlaneEvent = true;

@@ -26,7 +26,7 @@ public class TimeSystem {
                         hour = 0;
                         day++;
                     }
-                    if (Math.random() <= 0.04 && canRainny&& gamePanel.canPlaneEvent) {//กำหนดโอกาสที่ฝนจะตก
+                    if (Math.random() <= 0.04&&canRainny&&gamePanel.canPlaneEvent&&!gamePanel.artIsEnabled) {//กำหนดโอกาสที่ฝนจะตก
                         gamePanel.rainEvent();
                         canRainny = false;
                         new Timer(5600, new ActionListener() {//ดีเลย์ฝนเมื่อตกไปแล้ว อีก 5 วิถึงจะสามารถมีโอกาสตกอีก
