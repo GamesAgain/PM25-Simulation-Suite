@@ -31,11 +31,13 @@ import javax.swing.Timer;
 import font.SetFont;
 
 public class GamePanel extends JPanel{
+    private GameWindow gameWindow;
     private TimeSystem timeSystem;
 
     private boolean isStarted = false;//เช็คว่าเกมส์เริ่มอย่ไหม
     private Image checkInfoImage;
-    private Cursor customCursor;
+    private Cursor checkInfoCursor;
+    private Cursor planeCursor;
     private boolean isMaximized = isMaximumSizeSet();
 
 
@@ -89,61 +91,65 @@ public class GamePanel extends JPanel{
     private int percentArray[];
 
     //กำหนดตัวแปร  Components ใน Method createInputComponent
-    ImageIcon okIcon;
-    ImageIcon randomIcon;
-    JButton okButton;
-    JButton randomButton;
-    JTextField inputPopulation;
+    private ImageIcon okIcon;
+    private ImageIcon randomIcon;
+    private JButton okButton;
+    private JButton randomButton;
+    private JTextField inputPopulation;
 
     //กำหนดตัวแปร  Components ใน Method createEventComponent
-    ImageIcon pauseIcon;
-    ImageIcon startIcon;
-    ImageIcon planeIcon;
-    ImageIcon rainIcon;
-    JLabel dayText;
-    JLabel hourText;
+    private ImageIcon pauseIcon;
+    private ImageIcon startIcon;
+    private ImageIcon planeIcon;
+    private ImageIcon rainIcon;
+    public JLabel dayText;
+    public JLabel hourText;
 
     //กำหนดตัวแปร Component ใน Method createMenuPanel
-    JTextField selectFileText;
+    private JTextField selectFileText;
 
     //กำหนดตัวแปร Component ใน Method createInfoPanel
-    ImageIcon statusInfomationIcon;
-    JLabel showInfomation;
-    JLabel statusInfomation;
+    private ImageIcon statusInfomationIcon;
+    private JLabel statusInfomation;
 
-    JLabel areaText;
-    JLabel dustText;
-    JLabel populationText;
-    JLabel healthyText;
-    JLabel patientText;
-    JLabel percentText;
+    private JLabel areaText;
+    private JLabel dustText;
+    private JLabel populationText;
+    private JLabel healthyText;
+    private JLabel patientText;
+    private JLabel percentText;
 
     //กำหนดตัวแปร CardLayout 
-    CardLayout statusLayout;
-    JPanel statusCard;
-    JLabel statusCard0;
-    JLabel statusCard1;
-    JLabel statusCard2;
-    JLabel statusCard3;
-    JLabel statusCard4;
+    private CardLayout statusLayout;
+    private JPanel statusCard;
+    private JLabel statusCard0;
+    private JLabel statusCard1;
+    private JLabel statusCard2;
+    private  JLabel statusCard3;
+    private JLabel statusCard4;
 
     //ส่วนของ Animation
-    JLabel eventAnimation;
-    ImageIcon staticIcon; //ตึกเปล่าๆ
-    ImageIcon artificialrainIconlIcon;
-    ImageIcon rainyIcon;
+    private JLabel eventAnimation;
+    private ImageIcon staticIcon; //ตึกเปล่าๆ
+    private ImageIcon artificialrainIconlIcon;
+    private ImageIcon rainyIcon;
     
-
     
-    File selectedFile;
-    int areaIndex;
-    boolean canRainny = true;//ทำให้ฝนตกได้หมด ทำไว้ให้มีดีเลย์ในการเรียกฝน
-    boolean isPause = false;
+    private File selectedFile;
+    private int areaIndex;
+    public boolean canRainny = true;//ทำให้ฝนตกได้หมด ทำไว้ให้มีดีเลย์ในการเรียกฝน
+    public boolean canPlaneEvent = true;//ฝนเทียมติดคลูดาวน์ไหม
+    private boolean isPause = false;
+    private boolean artIsEnabled = false;
 
     public GamePanel(GameWindow gameWindow){
+        this.gameWindow = gameWindow;
         //เพิ่มภาพลง Cursor
         checkInfoImage = new ImageIcon(getClass().getResource("/mouse/cursor/checkInfo.png")).getImage();
-        customCursor = Toolkit.getDefaultToolkit().createCustomCursor(checkInfoImage, new Point(0, 0), "custom cursor");
+        checkInfoCursor = Toolkit.getDefaultToolkit().createCustomCursor(checkInfoImage, new Point(0, 0), "custom cursor");
+
+        Image planeInfoImage = new ImageIcon(getClass().getResource("/mouse/cursor/planeCursor.png")).getImage();
+        planeCursor = Toolkit.getDefaultToolkit().createCustomCursor(planeInfoImage, new Point(0, 0), "Plane cursor");
 
         //เพิ่มภาพ Status แต่ละแบบ
         status0 = new ImageIcon(getClass().getResource("/image/tableType/TYPE0.png"));
@@ -417,7 +423,6 @@ public class GamePanel extends JPanel{
             
         });
         stopButton.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 isStarted = false;
@@ -474,7 +479,7 @@ public class GamePanel extends JPanel{
                     menuLayout.show(menuCard, "Event");
                     timeSystem.start();//เริ่มเวลาในเกมส์
                 } catch (NumberFormatException x) {
-                    JOptionPane.showMessageDialog(null,"Please input population", "Input Error",JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null,"Please input the population range.", "Input Error",JOptionPane.ERROR_MESSAGE);
                 }
             }
             
@@ -525,8 +530,11 @@ public class GamePanel extends JPanel{
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (isPause) {
-                    if (canRainny) {
+                    if (canRainny&&canPlaneEvent) {
                         rainEvent();
+                    }
+                    else if (canRainny&&!canPlaneEvent) {
+                        JOptionPane.showMessageDialog(null,"Artificial rain is falling", "CD",JOptionPane.WARNING_MESSAGE);
                     }
                     else
                     {
@@ -539,6 +547,27 @@ public class GamePanel extends JPanel{
                 }
                 
                 
+            }
+            
+        });
+
+        planeButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (canPlaneEvent&&canRainny) {
+                    for (int i = 0; i < populationฺBox.length; i++) {
+                        populationฺBox[i].setCursor(planeCursor);
+                    }
+                    artIsEnabled = true;
+                }
+                else if (canPlaneEvent&&!canRainny) {
+                    JOptionPane.showMessageDialog(null,"It's rainning", "CD",JOptionPane.WARNING_MESSAGE);
+                }
+                else
+                {
+                    JOptionPane.showMessageDialog(null,"Artificial rain is falling", "CD",JOptionPane.WARNING_MESSAGE);
+                }
             }
             
         });
@@ -676,7 +705,6 @@ public class GamePanel extends JPanel{
                     selectedFile = fileChooser.getSelectedFile();
                     if (selectedFile.getName().endsWith(".txt")) {//เช็คว่าใช่ไฟล์ สกุล .txt ไหม
                         readFile(selectedFile);
-                        selectFileText.setText(selectedFile.getName());
                     }
                     else
                     {
@@ -701,6 +729,7 @@ public class GamePanel extends JPanel{
     }
     private void saveData(String data){
         try {
+            selectFileText.setText(selectedFile.getName());
             String[] stringArray = data.split("\\s+");
 
         // สร้าง array ของ int เพื่อเก็บค่าที่แปลงแล้ว
@@ -713,6 +742,7 @@ public class GamePanel extends JPanel{
 
         haveData();//เรียก Method เช็คว่ามีข้อมูลเข้ามายัง
         } catch (NumberFormatException e) {
+            selectFileText.setText("Select File");
             JOptionPane.showMessageDialog(null,"The input should be numbers.", "Input Error",JOptionPane.ERROR_MESSAGE);
         }
         
@@ -729,7 +759,7 @@ public class GamePanel extends JPanel{
             populationฺBox[i].setBackground(myDarkGrey);
             populationฺBox[i].setBorderPainted(false);
             populationฺBox[i].setFocusPainted(false);
-            populationฺBox[i].setCursor(customCursor);
+            populationฺBox[i].setCursor(checkInfoCursor);
             tablePanel.add(populationฺBox[i]);
         }
         
@@ -742,6 +772,7 @@ public class GamePanel extends JPanel{
         healthyText.setText("null");
         patientText.setText("null");
         percentText.setText("null");
+        nextButton.setIcon(pauseIcon);
         try {
             for (int i = 0; i < 200; i++) {
                 statusShow[i]="0";
@@ -795,7 +826,6 @@ public class GamePanel extends JPanel{
             populationฺBox[i].setBackground(myDarkGrey);
             populationฺBox[i].setBorderPainted(false);
             populationฺBox[i].setFocusPainted(false);
-            populationฺBox[i].setCursor(customCursor);
         }
     }
     private void paintGame(int populationArray[]){
@@ -869,11 +899,19 @@ public class GamePanel extends JPanel{
             populationฺBox[i].addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    try {
-                        showInfomation(index);
-                    } catch (NullPointerException n) {
-                        // ดักจับตอนคลิปเช็คตอนไม่มีข้อมูล
+                    if (artIsEnabled) {
+                        artIsEnabled=false;
+                        planeEvent(index);
                     }
+                    else
+                    {
+                        try {
+                            showInfomation(index);
+                        } catch (NullPointerException n) {
+                            // ดักจับตอนคลิปเช็คตอนไม่มีข้อมูล
+                        }
+                    }
+                    
                 }
             });
         }
@@ -898,6 +936,7 @@ public class GamePanel extends JPanel{
     public void rainEvent(){
         //เมื่อเวลาผ่านไป 2.5 วิ จะปิด Gif
         eventAnimation.setIcon(rainyIcon);
+        repaint();
         canRainny = false;
         Timer timer = new Timer(5500, new ActionListener() {
             @Override
@@ -918,6 +957,58 @@ public class GamePanel extends JPanel{
         });
         timer.setRepeats(false); // ตั้งค่าให้ทำงานครั้งเดียว
         timer.start();
+    }
+    private void planeEvent(int index){
+        eventAnimation.setIcon(artificialrainIconlIcon);
+        for (int i = 0; i < populationฺBox.length; i++) {
+            populationฺBox[i].setCursor(checkInfoCursor);
+        }
+        repaint();
+        canPlaneEvent = false;
+        Timer timer = new Timer(8000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                eventAnimation.setIcon(staticIcon);
+                //3 ตัวบน
+                if (index-21>=0&&index-21<=199) {
+                    dustLevel[index-21] = dustLevel[index-21]-(dustLevel[index-21]*30/100);
+                }
+                if (index-20>=0&&index-20<=199) {
+                     dustLevel[index-20] = dustLevel[index-20]-(dustLevel[index-20]*30/100);
+                }
+                if (index-19>=0&&index-19<=199) {
+                    dustLevel[index-19] = dustLevel[index-19]-(dustLevel[index-19]*30/100);
+                }
+                if (index-21>=0&&index-21<=199) {
+                    dustLevel[index-21] = dustLevel[index-21]-(dustLevel[index-21]*30/100);
+                }
+
+                // 3 ตัวตรงกลาง
+                if (index-1>=0&&index-1<=199) {
+                    dustLevel[index-1] = dustLevel[index-1]-(dustLevel[index-1]*30/100);
+                }
+                    dustLevel[index] = dustLevel[index]-(dustLevel[index]*50/100); //ตัวที่กดเครื่องบินใส่
+                if (index+1>=0&&index+1<=199) {
+                        dustLevel[index+1] = dustLevel[index+1]-(dustLevel[index+1]*30/100);
+                }
+                 // 3 ตัวด้านล่าง
+                if (index+19>=0&&index+19<=199) {
+                    dustLevel[index+19] = dustLevel[index+19]-(dustLevel[index+19]*30/100);
+                }
+                if (index+20>=0&&index+20<=199) {
+                    dustLevel[index+20] = dustLevel[index+20]-(dustLevel[index+20]*30/100);
+                }
+                if (index+21>=0&&index+21<=199) {
+                    dustLevel[index+21] = dustLevel[index+21]-(dustLevel[index+21]*30/100);
+                }
+                updateGame();
+                showInfomation(getAreaIndex());
+                canPlaneEvent = true;
+            }
+        });
+        timer.setRepeats(false);// ตั้งค่าให้ทำงานครั้งเดียว
+        timer.start();
+        
     }
     public void updateGame(){
         paintGame(populationArray);
