@@ -2,16 +2,13 @@ package main;
 
 import java.awt.CardLayout;
 import java.awt.Image;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
 public class GameWindow extends JFrame {
-    public boolean isMaximized;
-    public int width= 1280,height=720;
+    public int width= 1280, height=720;
     private JPanel mainPanel;
     private CardLayout cardLayout;
 
@@ -38,20 +35,6 @@ public class GameWindow extends JFrame {
         setFocusable(true);
         add(mainPanel); 
         showMenuPanel();
-
-        //ปรับขนาดจอ
-        isMaximized = isMaximumSizeSet();
-        addWindowListener(new WindowAdapter() {
-          @Override
-          public void windowActivated(WindowEvent e) {
-              if (isMaximized) {
-                setMaxScreen();
-              }
-              else{
-                setNormalScreen();
-              }
-          }
-        });
     }
 
     public void showGamePanel(){
@@ -72,14 +55,6 @@ public class GameWindow extends JFrame {
         return gameImageIcon.getImage();
     }
 
-    public void setMaxScreen(){
-        isMaximized=true;
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
-    }
-    public void setNormalScreen(){
-        isMaximized=false;
-        setExtendedState(JFrame.NORMAL);
-    }
     public GamePanel getGamePanel(){
         return this.gamePanel;
     }

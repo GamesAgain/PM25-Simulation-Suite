@@ -10,7 +10,7 @@ public class TimeSystem {
     private static int hour = 0;
     private JLabel dayText;
     private JLabel hourText;
-    private static final int REAL_SECOND_PER_VIRTUAL_HOUR = 500; // 0.5 วินาทีในมิลลิวินาที
+    private static final int REAL_SECOND_PER_VIRTUAL_HOUR = 500; // 0.5 วินาที
     public static volatile boolean canRainny = true;
     Timer timer;
     public TimeSystem(GamePanel gamePanel){
@@ -29,7 +29,7 @@ public class TimeSystem {
                     if (Math.random() <= 0.04&&canRainny&&gamePanel.canPlaneEvent&&!gamePanel.artIsEnabled) {//กำหนดโอกาสที่ฝนจะตก
                         gamePanel.rainEvent();
                         canRainny = false;
-                        new Timer(5600, new ActionListener() {//ดีเลย์ฝนเมื่อตกไปแล้ว อีก 5 วิถึงจะสามารถมีโอกาสตกอีก
+                        new Timer(5600, new ActionListener() {//ดีเลย์ฝนเมื่อตกไปแล้ว อีก 5.6 วิถึงจะสามารถมีโอกาสตกอีก
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 canRainny = true;

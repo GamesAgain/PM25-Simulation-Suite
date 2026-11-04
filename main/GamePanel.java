@@ -31,7 +31,7 @@ public class GamePanel extends JPanel{
     private boolean stopEvent = false;
     private TimeSystem timeSystem;
 
-    private boolean isStarted = false;//เช็คว่าเกมส์เริ่มอย่ไหม
+    private boolean isStarted = false;//เช็คว่าเกมส์เริ่มอยู่่ไหม
     private Image checkInfoImage;
     private Cursor checkInfoCursor;
     private Cursor planeCursor;
@@ -51,8 +51,9 @@ public class GamePanel extends JPanel{
 
     //สร้าง Color
     private Color myDarkGrey = new Color(57, 68, 76);
-    private Color myLightGrey = new Color(93, 108, 114,200);
     private Color myLightGrey0 = new Color(93, 108, 114);
+    private Color myLightGrey = new Color(93, 108, 114,200);
+    
 
     //กำหนดตัวแปร Panel ต่างๆ
     private JPanel infoJPanel;
@@ -83,7 +84,7 @@ public class GamePanel extends JPanel{
 
     //กำหนดตัวแปร Array ของ ปุ่มประชากรแต่พื้นที่
     private String statusShow[];
-    private JButton populationฺBox[];
+    private JButton populationBox[];
     private float dustLevel[];
     private int populationArray[];
     private float healthyArray[];
@@ -109,7 +110,7 @@ public class GamePanel extends JPanel{
     private JTextField selectFileText;
 
     //กำหนดตัวแปร Component ใน Method createInfoPanel
-    JLabel textJLabel;
+    private JLabel textJLabel;
     private ImageIcon statusInfomationIcon;
     private JLabel statusInfomation;
 
@@ -148,7 +149,7 @@ public class GamePanel extends JPanel{
     public GamePanel(GameWindow gameWindow){
         //เพิ่มภาพลง Cursor
         checkInfoImage = new ImageIcon(getClass().getResource("/mouse/cursor/checkInfo.png")).getImage();
-        checkInfoCursor = Toolkit.getDefaultToolkit().createCustomCursor(checkInfoImage, new Point(0, 0), "custom cursor");
+        checkInfoCursor = Toolkit.getDefaultToolkit().createCustomCursor(checkInfoImage, new Point(0, 0), "CheckInfo cursor");
 
         Image planeInfoImage = new ImageIcon(getClass().getResource("/mouse/cursor/planeCursor.png")).getImage();
         planeCursor = Toolkit.getDefaultToolkit().createCustomCursor(planeInfoImage, new Point(0, 0), "Plane cursor");
@@ -160,7 +161,6 @@ public class GamePanel extends JPanel{
         status3 = new ImageIcon(getClass().getResource("/image/tableType/TYPE3.png"));
         status4 = new ImageIcon(getClass().getResource("/image/tableType/TYPE4.png"));
 
-        //จอเล็ก
         statusInfo0 = new ImageIcon(getClass().getResource("/image/statusType/0.png"));
         statusInfo1 = new ImageIcon(getClass().getResource("/image/statusType/1.png"));
         statusInfo2 = new ImageIcon(getClass().getResource("/image/statusType/2.png"));
@@ -172,23 +172,24 @@ public class GamePanel extends JPanel{
 
         setSize(gameWindow.width,gameWindow.height);
         setLayout(null);
+
         //สร้าง Panel ต่างๆ
-        createInfoPanel(); //สร้าง Panel ของหน้าแสดงรายละเอียดฝั่งซ้ายสุด
-        createTablePanel(); //สร้าง Panel ของหน้าแสดงตาราง 20*10
-        createMenuPanel(); //สร้าง Panel ของหน้าเมนูฝั่งขวาสุด
-        createEventPanel(); //สร้าง Panel ของหน้าเหตุการณ์ภายในเกม(Event)อยู่ล่างจอ
-        createControlPanel(gameWindow); //สร้าง Panel เป็น Bar ข้างบนควมคุมการลดขยายจอ พักจอ และกลับไปหน้าเมนู
-
-        //สร้าง Button
-        createMenuButton(); //สร้าง ปุ่มที่หน้า Menu ฝั่งขวา
-        setStartGame();//ตั้งค่า Default ของ Game
-        populationฺButtonAction(); //เพิ่ม Action ให้ปุ่ม
-
-        timeSystem = new TimeSystem(this);//สร้าง object ระบบเวลา
+        createInfoPanel(); 
+        createTablePanel();
+        createMenuPanel();
+        createEventPanel();
+        createControlPanel(gameWindow);
+        
+        setStartGame();
+        timeSystem = new TimeSystem(this);
     }
     //Method สร้าง Panel Infomation ของประชากรในแต่ละช่อง
     private void createInfoPanel(){
-        
+        infoJPanel = new JPanel();
+        infoJPanel.setBounds(0, 30, 200, 900);
+        infoJPanel.setLayout(null);
+        infoJPanel.setBackground(myLightGrey);
+
         statusLayout = new CardLayout();
         statusCard = new JPanel(statusLayout);
         statusCard0 = new JLabel(statusInfo0);
@@ -197,23 +198,16 @@ public class GamePanel extends JPanel{
         statusCard3 = new JLabel(statusInfo3);
         statusCard4 = new JLabel(statusInfo4);
 
+        statusCard.setBounds(5, 5, infoJPanel.getWidth()-10, (int)(infoJPanel.getHeight()/2.5));
+
         statusCard.add(statusCard0,"0");
         statusCard.add(statusCard1,"1");
         statusCard.add(statusCard2,"2");
         statusCard.add(statusCard3,"3");
         statusCard.add(statusCard4,"4");
-        
 
-        statusInfomation = new JLabel(statusInfomationIcon);
+        statusInfomation = new JLabel(statusInfomationIcon);       
         
-
-        infoJPanel = new JPanel();
-        infoJPanel.setBounds(0, 30, 200, 900);
-        infoJPanel.setLayout(null);
-        infoJPanel.setBackground(myLightGrey);
-        
-        statusCard.setBounds(5, 5, infoJPanel.getWidth()-10, (int)(infoJPanel.getHeight()/2.5));
-
         areaText = new JLabel("null");
         dustText = new JLabel("null");
         populationText = new JLabel("null");
@@ -247,6 +241,7 @@ public class GamePanel extends JPanel{
 
         textJLabel = new JLabel();
         textJLabel.setBounds(5, 5, infoJPanel.getWidth()-10, (int)(infoJPanel.getHeight()/2.5));
+
         //เพิ่ม text บนหน้าาโชว์รายละเอียด
         textJLabel.add(areaText);
         textJLabel.add(dustText);
@@ -267,16 +262,17 @@ public class GamePanel extends JPanel{
     }
     //Method สร้าง Panel ตาราง 20*10 
     private void createTablePanel(){
-        populationฺBox = new JButton[200];
-        for (int i = 0; i < populationฺBox.length; i++) {
-            populationฺBox[i]=new JButton("",status0);
+        populationBox = new JButton[200];
+        for (int i = 0; i < populationBox.length; i++) {
+            populationBox[i]=new JButton("",status0);
         }
+
         tablePanel = new JPanel();
         tablePanel.setBounds(205, 30 , 870, 528);
         tablePanel.setLayout(new GridLayout(10,20,5,5));
         tablePanel.setBackground(myLightGrey);
-        
         add(tablePanel);
+        populationฺButtonAction();
     }
     //Method สร้าง Panel menu ควบคุมโปรแกรมต่างๆ Start,Select FIle
     private void createMenuPanel(){
@@ -285,6 +281,7 @@ public class GamePanel extends JPanel{
         menuPanel.setLayout(null);
         menuPanel.setBackground(myLightGrey);
         add(menuPanel);
+        createMenuButton();
     }
     //Method สร้าง Panel Event ใช้แสดงหน้า เหตุการณ์ต่างๆ เช่น ฝนเทียม,ฝนธรรมชาติ
     private void createEventPanel(){
@@ -320,7 +317,8 @@ public class GamePanel extends JPanel{
         int frameWidth = menuPanel.getWidth();
         menuLayout = new CardLayout();
         menuCard = new JPanel(menuLayout);
-        
+        menuCard.setBounds(5, 300, 190, 385);
+        menuCard.setBackground(myLightGrey0);
         
         //นำ Icon แต่ละปุ่มเข้ามา
         openFileIcon = new ImageIcon(getClass().getResource("/button/OpenFileButton.png"));
@@ -335,9 +333,6 @@ public class GamePanel extends JPanel{
         startButton = new JButton(simulateIcon);
         stopButton = new JButton(stopIcon);
         
-        menuCard.setBounds(5, 300, 190, 385);
-        menuCard.setBackground(myLightGrey0);
-
         //ทำหน้าไว้สลับใช้งาน
         empty = new JPanel();
         menuInput = new JLabel(inputIcon);
@@ -348,6 +343,10 @@ public class GamePanel extends JPanel{
         createEventComponent(menuEvent);
         createInputComponent(menuInput);
 
+        menuCard.add(empty,"Empty");
+        menuCard.add(menuInput,"Input");
+        menuCard.add(menuEvent,"Event");
+        menuLayout.show(menuCard, "Empty");
 
         selectFileText = new JTextField("Select File");
         selectFileText.setBounds(20,0,frameWidth-115,35);
@@ -363,16 +362,10 @@ public class GamePanel extends JPanel{
         inputDustArea.setBackground(Color.LIGHT_GRAY);
         inputDustArea.add(selectFileText);
 
-
         //ตั้งตำแหน่งปุ่ม
         openFileButton.setBounds(15, 75, 170, 50);
         startButton.setBounds(15, 150, 170, 50);
         stopButton.setBounds(15, 210, 170, 50);
-
-        menuCard.add(empty,"Empty");
-        menuCard.add(menuInput,"Input");
-        menuCard.add(menuEvent,"Event");
-        menuLayout.show(menuCard, "Empty");
 
         menuPanel.add(menuCard);
         menuPanel.add(inputDustArea);
@@ -419,6 +412,7 @@ public class GamePanel extends JPanel{
             }
             
         });
+
         stopButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -641,8 +635,8 @@ public class GamePanel extends JPanel{
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (canPlaneEvent&&canRainny) {
-                    for (int i = 0; i < populationฺBox.length; i++) {
-                        populationฺBox[i].setCursor(planeCursor);
+                    for (int i = 0; i < populationBox.length; i++) {
+                        populationBox[i].setCursor(planeCursor);
                     }
                     artIsEnabled = true;
                 }
@@ -694,6 +688,7 @@ public class GamePanel extends JPanel{
                     
                 }
     }
+
     private void readFile(File file) {
         //เป็น object ใช้อ่านไฟล์
         StringBuilder content = new StringBuilder();
@@ -704,10 +699,9 @@ public class GamePanel extends JPanel{
             }
             data = content.toString();//แปลง เป็น String
             saveData(data);
-        } catch (IOException e) {
-
-        }
+        } catch (IOException e) {}
     }
+
     private void saveData(String data){
         try {
             statusShow = new String[dustLevel.length];
@@ -725,28 +719,25 @@ public class GamePanel extends JPanel{
                 dustLevel[i] = Float.parseFloat(stringArray[i]);//มี String ที่เป็น Empty String มั้ย
             }
         }
-        haveData();//เรียก Method เช็คว่ามีข้อมูลเข้ามายัง
         } catch (NumberFormatException e) {
             selectFileText.setText("Select File");
             JOptionPane.showMessageDialog(null,"The input should be numbers.", "Input Error",JOptionPane.ERROR_MESSAGE);
         }
     }
-    //เช็คว่ามีข้อมูลไหม
-    private boolean haveData(){
-        return true;
-    }
 
     //กำหนดตารางตอนเริ่มที่ยังไม่มีข้อมูล
     private void setStartGame(){
-        for (int i = 0; i < populationฺBox.length; i++) {
-            populationฺBox[i].setIcon(status0);
-            populationฺBox[i].setBackground(myDarkGrey);
-            populationฺBox[i].setBorderPainted(false);
-            populationฺBox[i].setFocusPainted(false);
-            populationฺBox[i].setCursor(checkInfoCursor);
-            tablePanel.add(populationฺBox[i]);
+        for (int i = 0; i < populationBox.length; i++) {
+            populationBox[i].setIcon(status0);
+            populationBox[i].setBackground(myDarkGrey);
+            populationBox[i].setBorderPainted(false);
+            populationBox[i].setFocusPainted(false);
+            
+            tablePanel.add(populationBox[i]);
         }
+        setTableCursor();
     }
+
     public void restartGame(){
         stopEvent = true;
         if (planeAnimTimer!=null) {
@@ -767,7 +758,7 @@ public class GamePanel extends JPanel{
         isStarted = false;
 
         menuLayout.show(menuCard, "Empty");
-        timeSystem.restart();//reset เวลา
+        timeSystem.restart();
         eventAnimation.setIcon(staticIcon);
         statusLayout.show(statusCard, "0");
         areaText.setText("null");
@@ -777,19 +768,17 @@ public class GamePanel extends JPanel{
         patientText.setText("null");
         percentText.setText("null");
         nextButton.setIcon(pauseIcon);
+        setTableCursor();
         try {
             for (int i = 0; i < dustLevel.length; i++) {
                 statusShow[i]="0";
-                populationฺBox[i].setIcon(status0);
-                populationฺBox[i].setBackground(myDarkGrey);
+                populationBox[i].setIcon(status0);
+                populationBox[i].setBackground(myDarkGrey);
                 dustLevel[i]=0;
                 populationArray[i]=0;
                 healthyArray[i]=0;
                 patientArray[i]=0;
                 percentArray[i]=0;
-            }
-            for (int i = 0; i < populationฺBox.length; i++) {
-                populationฺBox[i].setBackground(myDarkGrey);
             }
         } catch (NullPointerException e) {}
         this.revalidate();
@@ -799,7 +788,6 @@ public class GamePanel extends JPanel{
     //Method เริ่มการจำลอง
     private void startGame(int population,boolean isRandom){ 
         //สร้าง object Array ค่าต่างๆภายในเกมส์
-
         if (!isRandom) {
             for (int i = 0; i < dustLevel.length; i++) {
                 populationArray[i]=population;
@@ -827,89 +815,67 @@ public class GamePanel extends JPanel{
                 }
             } catch (NullPointerException e) {}
             
-            populationฺBox[i].setIcon(status);
-            populationฺBox[i].setBackground(myDarkGrey);
-            populationฺBox[i].setBorderPainted(false);
-            populationฺBox[i].setFocusPainted(false);
+            populationBox[i].setIcon(status);
         }
-        } catch (ArrayIndexOutOfBoundsException e) {
-            //ข้อมูลเกิน 200
-            System.out.println("ข้อมูลเกิน 200 ปุ่ม");
-        }
-        
+        } catch (ArrayIndexOutOfBoundsException e) {}
     }
+
     private void paintGame(int populationArray[]){
         String checkStatus = "0";
-        try {
-            
-        } catch (Exception e) {
-        }
        for (int i = 0; i < dustLevel.length; i++) {
             if (dustLevel[i]>=0&&dustLevel[i]<=250) {
                 if (dustLevel[i] >= 0 && dustLevel[i] <= 50) {
                     checkStatus = "1";
-                    int minPercentage = 0;//เปอร์เซ็นต์ต่ำสุด
-                    int maxPercentage = 9;//เปอร์เซ็นต์สูงสุด
+                    int minPercentage = 0;
+                    int maxPercentage = 9;
     
-                    // สร้าง Random object เพื่อสุ่มค่าเปอร์เซ็นต์
                     Random random = new Random();
                     percentArray[i] = random.nextInt(maxPercentage - minPercentage + 1) + minPercentage;
-    
-                    // คำนวณจำนวนคนที่ป่วย
                     patientArray[i] = (int) ((percentArray[i] / 100.0) * populationArray[i]);
                     healthyArray[i] = populationArray[i]-patientArray[i];
-                    statusShow[i]=checkStatus; //เก็บว่าจะให้แสดงสีไหน
+                    statusShow[i]=checkStatus;
                 }
                 else if (dustLevel[i] >= 51 && dustLevel[i] <= 100) {
                     checkStatus = "2";
-                    int minPercentage = 10;//เปอร์เซ็นต์ต่ำสุด
-                    int maxPercentage = 19;//เปอร์เซ็นต์สูงสุด
+                    int minPercentage = 10;
+                    int maxPercentage = 19;
     
-                    // สร้าง Random object เพื่อสุ่มค่าเปอร์เซ็นต์
                     Random random = new Random();
                     percentArray[i] = random.nextInt(maxPercentage - minPercentage + 1) + minPercentage;
-    
-                    // คำนวณจำนวนคนที่ป่วย
                     patientArray[i] = (int) ((percentArray[i] / 100.0) * populationArray[i]);
                     healthyArray[i] = populationArray[i]-patientArray[i];
-                    statusShow[i]=checkStatus; //เก็บว่าจะให้แสดงสีไหน
+                    statusShow[i]=checkStatus;
                 }
                 else if (dustLevel[i] >= 101 && dustLevel[i] <= 150) {
                     checkStatus = "3";
-                    int minPercentage = 20;//เปอร์เซ็นต์ต่ำสุด
-                    int maxPercentage = 29;//เปอร์เซ็นต์สูงสุด
-    
-                    // สร้าง Random object เพื่อสุ่มค่าเปอร์เซ็นต์
+                    int minPercentage = 20;
+                    int maxPercentage = 29;
+
                     Random random = new Random();
                     percentArray[i] = random.nextInt(maxPercentage - minPercentage + 1) + minPercentage;
-    
-                    // คำนวณจำนวนคนที่ป่วย
                     patientArray[i] = (int) ((percentArray[i] / 100.0) * populationArray[i]);
                     healthyArray[i] = (int)populationArray[i]-patientArray[i];
-                    statusShow[i]=checkStatus; //เก็บว่าจะให้แสดงสีไหน
+                    statusShow[i]=checkStatus;
                 }
                 else if (dustLevel[i] >= 151 && dustLevel[i] <= 250) {
                     checkStatus = "4";
-                    int minPercentage = 30;//เปอร์เซ็นต์ต่ำสุด
-                    int maxPercentage = 50;//เปอร์เซ็นต์สูงสุด
-    
-                    // สร้าง Random object เพื่อสุ่มค่าเปอร์เซ็นต์
+                    int minPercentage = 30;
+                    int maxPercentage = 50;
+
                     Random random = new Random();
                     percentArray[i] = random.nextInt(maxPercentage - minPercentage + 1) + minPercentage;
-    
-                    // คำนวณจำนวนคนที่ป่วย
                     patientArray[i] = (int) ((percentArray[i] / 100.0) * populationArray[i]);
                     healthyArray[i] = populationArray[i]-patientArray[i];
-                    statusShow[i]=checkStatus; //เก็บว่าจะให้แสดงสีไหน
+                    statusShow[i]=checkStatus;
                 }
             }
-            
        }
     }
+
     private void populationฺButtonAction(){
-        for (int i = 0; i < populationฺBox.length; i++) {
+        for (int i = 0; i < populationBox.length; i++) {
             final int index = i;
-            populationฺBox[i].addActionListener(new ActionListener() {
+            populationBox[i].addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (artIsEnabled) {
@@ -920,11 +886,8 @@ public class GamePanel extends JPanel{
                     {
                         try {
                             showInfomation(index);
-                        } catch (NullPointerException n) {
-                            // ดักจับตอนคลิปเช็คตอนไม่มีข้อมูล
-                        }
+                        } catch (NullPointerException n) {}
                     }
-                    
                 }
             });
         }
@@ -935,15 +898,27 @@ public class GamePanel extends JPanel{
     private int getAreaIndex(){
         return this.areaIndex;
     }
+
     private void showInfomation(int index){
         setAreaIndex(index);
         areaText.setText(""+(index+1));
         try {
-            dustText.setText(""+(int)dustLevel[index]);
-            populationText.setText(""+(int)populationArray[index]);
-            healthyText.setText(""+(int)healthyArray[index]);
-            patientText.setText(""+(int)patientArray[index]);
-            percentText.setText(""+(int)percentArray[index]+"%");
+            if (stopEvent) {
+                dustText.setText("null");
+                populationText.setText("null");
+                healthyText.setText("null");
+                patientText.setText("null");
+                percentText.setText("null");
+                statusLayout.show(statusCard, "0");
+            }
+            else
+            {
+                dustText.setText(""+(int)dustLevel[index]);
+                populationText.setText(""+(int)populationArray[index]);
+                healthyText.setText(""+(int)healthyArray[index]);
+                patientText.setText(""+(int)patientArray[index]);
+                percentText.setText(""+(int)percentArray[index]+"%");
+            }
             if (dustLevel[index]>=0&&dustLevel[index]<=250) {
                 statusLayout.show(statusCard, statusShow[index]);
             }
@@ -960,16 +935,13 @@ public class GamePanel extends JPanel{
             percentText.setText("null");
             statusLayout.show(statusCard, "0");
         }
-        
         repaint();
     } 
+
     public void rainEvent(){
         canRainny = false;
         artIsEnabled = false;
-        for (int i = 0; i < populationฺBox.length; i++) {
-            populationฺBox[i].setCursor(checkInfoCursor);
-        }
-        //เมื่อเวลาผ่านไป 2.5 วิ จะปิด Gif
+        setTableCursor();
         eventAnimation.setIcon(rainyIcon);
         repaint();
         rainAnimTimer = new Timer(5500, new ActionListener() {
@@ -995,15 +967,16 @@ public class GamePanel extends JPanel{
         rainAnimTimer.start();
     }
     private void planeEvent(int index){
-        final int GRID_WIDTH = 20;  // จำนวนคอลัมน์
-        final int GRID_HEIGHT = 10; // จำนวนแถว
-        final Color SELECTED_COLOR = Color.CYAN;
-        final Color NEIGHBOR_COLOR = Color.GREEN;
+        int GRID_WIDTH = 20;  
+        int GRID_HEIGHT = 10;
+        Color SELECTED_COLOR = Color.CYAN;
+        Color NEIGHBOR_COLOR = Color.GREEN;
         eventAnimation.setIcon(artificialrainIconlIcon);
         int x = index % GRID_WIDTH;
         int y = index / GRID_WIDTH;
 
-        populationฺBox[index].setBackground(SELECTED_COLOR);//ตัวปุ่มที่กด
+        populationBox[index].setBackground(SELECTED_COLOR);//ตัวปุ่มที่กด
+
         for (int dy = -1; dy <= 1; dy++) {
             for (int dx = -1; dx <= 1; dx++) {
                 if (dx == 0 && dy == 0) continue;
@@ -1013,29 +986,27 @@ public class GamePanel extends JPanel{
 
                 if (nx >= 0 && nx < GRID_WIDTH && ny >= 0 && ny < GRID_HEIGHT) {
                     int neighborIndex = ny * GRID_WIDTH + nx;
-                    populationฺBox[neighborIndex].setBackground(NEIGHBOR_COLOR);//ตัวปุ่มรอบๆ 
+                    populationBox[neighborIndex].setBackground(NEIGHBOR_COLOR);//ตัวปุ่มรอบๆ 
                 }
             }
         }
-
-        for (int i = 0; i < populationฺBox.length; i++) {
-            populationฺBox[i].setCursor(checkInfoCursor);
-        }
-
+        
+        setTableCursor();
         repaint();
         canPlaneEvent = false;
+
         planeAnimTimer = new Timer(8000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!stopEvent) {
                     eventAnimation.setIcon(staticIcon);
                     try {     
-                        populationฺBox[index].setBackground(myDarkGrey);
+                        populationBox[index].setBackground(myDarkGrey);
                         if (dustLevel[index] >= 0 && dustLevel[index] <=250) {
                             dustLevel[index] = dustLevel[index]-(dustLevel[index]*50/100); //ปุ่มที่กดลด 50%
                         }
                     } catch (ArrayIndexOutOfBoundsException x) {
-                        populationฺBox[index].setBackground(myDarkGrey);
+                        populationBox[index].setBackground(myDarkGrey);
                     }
                     for (int dy = -1; dy <= 1; dy++) {
                         for (int dx = -1; dx <= 1; dx++) {
@@ -1048,12 +1019,12 @@ public class GamePanel extends JPanel{
                                 int neighborIndex = ny * GRID_WIDTH + nx;
                                 
                                 try {
-                                    populationฺBox[neighborIndex].setBackground(myDarkGrey);
+                                    populationBox[neighborIndex].setBackground(myDarkGrey);
                                     if (dustLevel[neighborIndex] >= 0 && dustLevel[neighborIndex] <=250) {
                                         dustLevel[neighborIndex] = dustLevel[neighborIndex]-(dustLevel[neighborIndex]*30/100);//ปุ่มรอบๆลด 30%
                                     }
                                 } catch (ArrayIndexOutOfBoundsException x) {
-                                    populationฺBox[neighborIndex].setBackground(myDarkGrey);
+                                    populationBox[neighborIndex].setBackground(myDarkGrey);
                                 }
                             }
                         }
@@ -1092,7 +1063,12 @@ public class GamePanel extends JPanel{
             } catch (NullPointerException e) {
                 status = status0;
             }
-            populationฺBox[i].setIcon(status);
+            populationBox[i].setIcon(status);
+        }
+    }
+    private void setTableCursor(){
+        for (int i = 0; i < populationBox.length; i++) {
+            populationBox[i].setCursor(checkInfoCursor);
         }
     }
 }

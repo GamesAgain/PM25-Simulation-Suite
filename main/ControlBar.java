@@ -13,7 +13,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-
 import font.SetFont;
 
 public class ControlBar extends JPanel{
@@ -97,7 +96,7 @@ public class ControlBar extends JPanel{
             public void componentResized(ComponentEvent e) {
                 int frameWidth = gameWindow.getWidth();
                 
-                setBounds(0, 0, frameWidth, 30); // ความกว้างเต็มหน้าจอ, ความสูง 30
+                setBounds(0, 0, frameWidth, 30);
             }
         });
     }
@@ -174,7 +173,7 @@ public class ControlBar extends JPanel{
             @Override
             public void componentResized(ComponentEvent e) {
                 int frameWidth = gameWindow.getWidth();
-                setBounds(0, 0, frameWidth, 30); // ความกว้างเต็มหน้าจอ, ความสูง 30
+                setBounds(0, 0, frameWidth, 30);
             }
         });
     }
