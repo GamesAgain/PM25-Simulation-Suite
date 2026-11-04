@@ -688,6 +688,7 @@ public class GamePanel extends JPanel{
                     }
                     else
                     {
+                        selectFileText.setText("Select File");
                         JOptionPane.showMessageDialog(null,"The file is not supported,\nPlease input the .txt file.", "Input Error",JOptionPane.ERROR_MESSAGE);
                     }
                     
