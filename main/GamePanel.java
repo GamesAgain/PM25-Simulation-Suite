@@ -715,25 +715,20 @@ public class GamePanel extends JPanel{
             patientArray = new float[dustLevel.length];
             percentArray = new float[dustLevel.length];
         } catch (NullPointerException e) {}
-
+        selectFileText.setText(selectedFile.getName());
+        String[] stringArray = data.split("\\s+");
         try {
-            selectFileText.setText(selectedFile.getName());
-            String[] stringArray = data.split("\\s+");
-
-        // สร้าง array ของ int เพื่อเก็บค่าที่แปลงแล้ว
-        dustLevel = new float[stringArray.length];
-
-        // แปลง string แต่ละตัวเป็น int แล้วเก็บใน int array
-        for (int i = 0; i < stringArray.length; i++) {
-            dustLevel[i] = Float.parseFloat(stringArray[i]);
+        dustLevel = new float[stringArray.length]; // สร้าง array ของ int เพื่อเก็บค่าที่แปลงแล้ว        
+        for (int i = 0; i < stringArray.length; i++) { // แปลง string แต่ละตัวเป็น int แล้วเก็บใน int array
+            if (stringArray[i].isEmpty()==false) {
+                dustLevel[i] = Float.parseFloat(stringArray[i]);//มี String ที่เป็น Empty String มั้ย
+            }
         }
-
         haveData();//เรียก Method เช็คว่ามีข้อมูลเข้ามายัง
         } catch (NumberFormatException e) {
             selectFileText.setText("Select File");
             JOptionPane.showMessageDialog(null,"The input should be numbers.", "Input Error",JOptionPane.ERROR_MESSAGE);
         }
-        
     }
     //เช็คว่ามีข้อมูลไหม
     private boolean haveData(){
