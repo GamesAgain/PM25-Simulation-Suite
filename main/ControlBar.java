@@ -19,7 +19,6 @@ import font.SetFont;
 public class ControlBar extends JPanel{
     private JLabel gameName;
     private JButton exitButton;
-    private JButton setMinMaxButton;
     private JButton hideWindowButton;
     private Color myDarkGrey = new Color(57, 68, 76);
     public ControlBar(GameWindow gameWindow){
@@ -41,15 +40,8 @@ public class ControlBar extends JPanel{
         exitButton.setBackground(myDarkGrey);
         exitButton.setForeground(Color.WHITE);
 
-        setMinMaxButton = new JButton("❑");
-        setMinMaxButton.setBounds(1180,0,50,30);
-        setMinMaxButton.setBorderPainted(false);
-        setMinMaxButton.setFocusPainted(false);
-        setMinMaxButton.setBackground(myDarkGrey);
-        setMinMaxButton.setForeground(Color.WHITE);
-
         hideWindowButton = new JButton("━");
-        hideWindowButton.setBounds(1130,0,50,30);
+        hideWindowButton.setBounds(1180,0,50,30);
         hideWindowButton.setBorderPainted(false);
         hideWindowButton.setFocusPainted(false);
         hideWindowButton.setBackground(myDarkGrey);
@@ -57,7 +49,6 @@ public class ControlBar extends JPanel{
 
         add(gameName);
         add(exitButton);
-        add(setMinMaxButton);
         add(hideWindowButton);
 
         //เมื่อกดปุ่ม "━" พักหน้าโปรแกรมไว้
@@ -80,35 +71,6 @@ public class ControlBar extends JPanel{
             }
             
         });
-
-        //เมื่อกดปุ่ม "❑" จะปรับลด/ขยาย
-        setMinMaxButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                setMinMaxButton.setBackground(Color.GREEN);
-            }
-            @Override
-            public void mouseExited(MouseEvent e) {
-                setMinMaxButton.setBackground(myDarkGrey);
-            }
-        });
-        setMinMaxButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (gameWindow.isMaximized) {
-                    gameWindow.setNormalScreen();
-                    setMinMaxButton.setText("❐");
-                }
-                else
-                {
-                    gameWindow.setMaxScreen();
-                    setMinMaxButton.setText("❑");
-                }
-            }
-            
-        });
-
         //เมื่อกดปุ่ม "✖" จะกลับไปหน้า Menu(หน้าแรก)
         exitButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -136,11 +98,6 @@ public class ControlBar extends JPanel{
                 int frameWidth = gameWindow.getWidth();
                 
                 setBounds(0, 0, frameWidth, 30); // ความกว้างเต็มหน้าจอ, ความสูง 30
-                
-                // ปรับขนาดและตำแหน่งของปุ่มใน controlPanel
-                exitButton.setBounds(frameWidth - 50, 0, 50, 30);
-                setMinMaxButton.setBounds(frameWidth - 100, 0, 50, 30);
-                hideWindowButton.setBounds(frameWidth - 150, 0, 50, 30);
             }
         });
     }
@@ -163,15 +120,8 @@ public class ControlBar extends JPanel{
         exitButton.setBackground(myDarkGrey);
         exitButton.setForeground(Color.WHITE);
 
-        setMinMaxButton = new JButton("❑");
-        setMinMaxButton.setBounds(1180,0,50,30);
-        setMinMaxButton.setBorderPainted(false);
-        setMinMaxButton.setFocusPainted(false);
-        setMinMaxButton.setBackground(myDarkGrey);
-        setMinMaxButton.setForeground(Color.WHITE);
-
         hideWindowButton = new JButton("━");
-        hideWindowButton.setBounds(1130,0,50,30);
+        hideWindowButton.setBounds(1180,0,50,30);
         hideWindowButton.setBorderPainted(false);
         hideWindowButton.setFocusPainted(false);
         hideWindowButton.setBackground(myDarkGrey);
@@ -179,7 +129,6 @@ public class ControlBar extends JPanel{
 
         add(gameName);
         add(exitButton);
-        add(setMinMaxButton);
         add(hideWindowButton);
 
         //เมื่อกดปุ่ม "━" พักหน้าโปรแกรมไว้
@@ -202,35 +151,6 @@ public class ControlBar extends JPanel{
             }
             
         });
-
-        //เมื่อกดปุ่ม "❑" จะปรับลด/ขยาย
-        setMinMaxButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                setMinMaxButton.setBackground(Color.GREEN);
-            }
-            @Override
-            public void mouseExited(MouseEvent e) {
-                setMinMaxButton.setBackground(myDarkGrey);
-            }
-        });
-        setMinMaxButton.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (gameWindow.isMaximized) {
-                    gameWindow.setNormalScreen();
-                    setMinMaxButton.setText("❐");
-                }
-                else
-                {
-                    gameWindow.setMaxScreen();
-                    setMinMaxButton.setText("❑");
-                }
-            }
-            
-        });
-
         //เมื่อกดปุ่ม "✖" จะกลับไปหน้า Menu(หน้าแรก)
         exitButton.addMouseListener(new MouseAdapter() {
             @Override
@@ -250,17 +170,11 @@ public class ControlBar extends JPanel{
             }
             
         });
-
         gameWindow.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
                 int frameWidth = gameWindow.getWidth();
                 setBounds(0, 0, frameWidth, 30); // ความกว้างเต็มหน้าจอ, ความสูง 30
-                
-                // ปรับขนาดและตำแหน่งของปุ่มใน controlPanel
-                exitButton.setBounds(frameWidth - 50, 0, 50, 30);
-                setMinMaxButton.setBounds(frameWidth - 100, 0, 50, 30);
-                hideWindowButton.setBounds(frameWidth - 150, 0, 50, 30);
             }
         });
     }

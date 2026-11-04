@@ -10,8 +10,6 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -49,11 +47,6 @@ public class GamePanel extends JPanel{
     private ImageIcon statusInfo2;
     private ImageIcon statusInfo3;
     private ImageIcon statusInfo4;
-    private ImageIcon statusInfo0M;
-    private ImageIcon statusInfo1M;
-    private ImageIcon statusInfo2M;
-    private ImageIcon statusInfo3M;
-    private ImageIcon statusInfo4M;
     private Image backgroundImage;
 
     //สร้าง Color
@@ -72,13 +65,8 @@ public class GamePanel extends JPanel{
     private ImageIcon openFileIcon;
     private ImageIcon simulateIcon;
     private ImageIcon stopIcon;
-    private ImageIcon openFileIconM;
-    private ImageIcon simulateIconM;
-    private ImageIcon stopIconM;
     private ImageIcon inputIcon;
     private ImageIcon eventIcon;
-    private ImageIcon inputIconM;
-    private ImageIcon eventIconM;
     private JPanel empty;
     private JLabel menuInput;
     private JLabel menuEvent;
@@ -123,7 +111,6 @@ public class GamePanel extends JPanel{
     //กำหนดตัวแปร Component ใน Method createInfoPanel
     JLabel textJLabel;
     private ImageIcon statusInfomationIcon;
-    private ImageIcon statusInfomationIconM;
     private JLabel statusInfomation;
 
     private JLabel areaText;
@@ -180,13 +167,6 @@ public class GamePanel extends JPanel{
         statusInfo3 = new ImageIcon(getClass().getResource("/image/statusType/3.png"));
         statusInfo4 = new ImageIcon(getClass().getResource("/image/statusType/4.png"));
         statusInfomationIcon = new ImageIcon(getClass().getResource("/image/tableType/statusInformation.png"));
-        //จอใหญ่
-        statusInfo0M = new ImageIcon(getClass().getResource("/image/statusType/Max/0.png"));
-        statusInfo1M = new ImageIcon(getClass().getResource("/image/statusType/Max/1.png"));
-        statusInfo2M = new ImageIcon(getClass().getResource("/image/statusType/Max/2.png"));
-        statusInfo3M = new ImageIcon(getClass().getResource("/image/statusType/Max/3.png"));
-        statusInfo4M = new ImageIcon(getClass().getResource("/image/statusType/Max/4.png"));
-        statusInfomationIconM = new ImageIcon(getClass().getResource("/image/tableType/statusInformationMAX.png"));//สำหรับจอใหญ่
 
         backgroundImage = new ImageIcon(getClass().getResource("/image/GameBG.png")).getImage();
 
@@ -205,129 +185,6 @@ public class GamePanel extends JPanel{
         populationฺButtonAction(); //เพิ่ม Action ให้ปุ่ม
 
         timeSystem = new TimeSystem(this);//สร้าง object ระบบเวลา
-
-        //ขยายจอ หรือ ลดขนาดจอ
-        gameWindow.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-
-                int frameWidth = gameWindow.getWidth();
-                int frameHeight = gameWindow.getHeight();
-                
-                int gap = 5; // ระยะห่างระหว่าง panels
-                
-                int newTableWidth = (int) (frameWidth * 0.68);
-                int newTableHeight = (int) (frameHeight * 0.73);
-                int newTableX = (int) (frameWidth * 0.16);
-                int newTableY = (int) (frameHeight * 0.04);
-                
-                tablePanel.setBounds(newTableX, newTableY, newTableWidth, newTableHeight);
-                tablePanel.revalidate(); // บังคับให้ tablePanel อัปเดต layout
-                tablePanel.repaint(); // บังคับให้ tablePanel วาดใหม่
-                
-                int newInfoWidth = (int) (frameWidth * 0.156);
-                int newInfoHeight = frameHeight - 30; // ใช้ความสูงเต็มจอ ยกเว้นส่วน controlPanel
-                infoJPanel.setBounds(0, 30, newInfoWidth, newInfoHeight);
-                
-                int newMenuWidth = frameWidth - newTableX - newTableWidth - gap - gap;
-                int newMenuHeight = frameHeight - 30; // ใช้ความสูงเต็มจอ ยกเว้นส่วน controlPanel
-                int newMenuX = frameWidth - newMenuWidth - gap;
-                menuPanel.setBounds(newMenuX, 30, newMenuWidth, newMenuHeight);
-                
-                int newEventY = newTableY + newTableHeight + gap; // ให้ eventPanel อยู่ถัดจาก tablePanel
-                int newEventHeight = frameHeight - newEventY; // ความสูงเต็มที่เหลือ
-                eventPanel.setBounds(newTableX, newEventY, newTableWidth, newEventHeight);
-
-                // ปรับขนาดและตำแหน่งของ components ใน infoJPanel
-                textJLabel.setBounds(5, 5, infoJPanel.getWidth() - 10, (int)(infoJPanel.getHeight() / 2));
-                statusCard.setBounds(5, 5, infoJPanel.getWidth() - 9, (int)(infoJPanel.getHeight() / 2)+15);
-                statusInfomation.setBounds(5, statusCard.getHeight()-15, infoJPanel.getWidth() - 10, (int)(infoJPanel.getHeight() / 2+15));
-
-
-                // ปรับขนาดและตำแหน่งของป้ายข้อความใน textJLabel
-                int textLabelWidth = textJLabel.getWidth();
-                int textLabelHeight = textJLabel.getHeight();
-                
-                areaText.setBounds((int)(textLabelWidth * 0.715), (int)(textLabelHeight * 0.120),  (int)(frameWidth * 0.0625), (int)(frameHeight * 0.0278));
-                dustText.setBounds((int)(textLabelWidth * 0.5), (int)(textLabelHeight * 0.396),  (int)(frameWidth * 0.0625), (int)(frameHeight * 0.0278));
-                populationText.setBounds((int)(textLabelWidth * 0.45), (int)(textLabelHeight * 0.508),  (int)(frameWidth * 0.0625), (int)(frameHeight * 0.0278));
-                healthyText.setBounds((int)(textLabelWidth * 0.53), (int)(textLabelHeight * 0.624),  (int)(frameWidth * 0.0625), (int)(frameHeight * 0.0278));
-                patientText.setBounds((int)(textLabelWidth * 0.45), (int)(textLabelHeight * 0.74),  (int)(frameWidth * 0.0625), (int)(frameHeight * 0.0278));
-                percentText.setBounds((int)(textLabelWidth * 0.715), (int)(textLabelHeight * 0.856),  (int)(frameWidth * 0.0625), (int)(frameHeight * 0.0278));
-
-                // ปรับขนาดและตำแหน่งของปุ่มใน menuPanel
-                openFileButton.setBounds(15, 75, newMenuWidth - 30, 50);
-                startButton. setBounds(15, 150, newMenuWidth - 30, 50);
-                stopButton.setBounds(15, 225, newMenuWidth - 30, 50);
-                selectFileText.setBounds(20, 0, newMenuWidth - 30, 35);
-                inputDustArea.setBounds(15, 30, newMenuWidth - 30, 30);
-
-                // ปรับขนาดและตำแหน่งของ eventAnimation ใน eventPanel
-                eventAnimation.setBounds(5, 5, eventPanel.getWidth() - 10, (int)(eventPanel.getHeight() * 0.93));
-                menuCard.setBounds(5, 300, newMenuWidth - 10, newMenuHeight - 300 - 10); // ปรับขนาด menuCard
-                if (gameWindow.isMaximized) {
-                    //ปรับขนาดเล็กในหมวดของ MenuCard
-                    //InputEvent
-                    menuInput.setIcon(inputIconM);
-                    menuEvent.setIcon(eventIconM);
-                    okButton.setBounds(165, 122, 26, 17);
-                    randomButton.setBounds(18, 150, 165, 40);
-                    inputPopulation.setBounds(85, 120, 80, 22);
-                    //menuEvent
-                    dayText.setBounds(110, 85, 50, 30);
-                    hourText.setBounds(153, 84, 52, 32);
-                    planeButton.setBounds(24, 125, 155, 72);
-                    rainButton.setBounds(25, 232, 155, 128);
-                    nextButton.setBounds(42, 375, 115, 40);
-                    
-
-                    openFileButton.setIcon(openFileIconM);
-                    startButton.setIcon(simulateIconM);
-                    stopButton.setIcon(stopIconM);
-
-                    statusCard0.setIcon(statusInfo0M);
-                    statusCard1.setIcon(statusInfo1M);
-                    statusCard2.setIcon(statusInfo2M);
-                    statusCard3.setIcon(statusInfo3M);
-                    statusCard4.setIcon(statusInfo4M);
-                    statusInfomation.setIcon(statusInfomationIconM);
-                }
-                else
-                {
-
-                    //ปรับขนาดเล็กในหมวดของ MenuCard
-                    //InputEvent
-                    menuInput.setIcon(inputIcon);
-                    menuEvent.setIcon(eventIcon);
-                    okButton.setBounds(153, 94, 26, 17);
-                    randomButton.setBounds(12, 123, 165, 40);
-                    inputPopulation.setBounds(80, 92, 80, 22);
-                    //menuEvent
-                    dayText.setBounds(104, 60, 50, 30);
-                    hourText.setBounds(145, 60, 50, 30);
-                    nextButton.setBounds(39, 330, 115, 40);
-                    planeButton.setBounds(22, 97, 145, 69);
-                    rainButton.setBounds(21, 197, 148, 120);
-
-                    openFileButton.setIcon(openFileIcon);
-                    startButton.setIcon(simulateIcon);
-                    stopButton.setIcon(stopIcon);
-
-                    statusCard0.setIcon(statusInfo0);
-                    statusCard1.setIcon(statusInfo1);
-                    statusCard2.setIcon(statusInfo2);
-                    statusCard3.setIcon(statusInfo3);
-                    statusCard4.setIcon(statusInfo4);
-                    statusInfomation.setIcon(statusInfomationIcon);
-                }
-                infoJPanel.revalidate();
-                infoJPanel.repaint();
-                menuPanel.revalidate();
-                menuPanel.repaint();
-                eventPanel.revalidate();
-                eventPanel.repaint();
-            }
-        });
     }
     //Method สร้าง Panel Infomation ของประชากรในแต่ละช่อง
     private void createInfoPanel(){
@@ -432,9 +289,9 @@ public class GamePanel extends JPanel{
     //Method สร้าง Panel Event ใช้แสดงหน้า เหตุการณ์ต่างๆ เช่น ฝนเทียม,ฝนธรรมชาติ
     private void createEventPanel(){
 
-        staticIcon = new ImageIcon(getClass().getResource("/Event/MAX/StaticEventMAX.png"));
-        artificialrainIconlIcon = new ImageIcon(getClass().getResource("/Event/MAX/PlaneEventGifMAX.gif"));
-        rainyIcon = new ImageIcon(getClass().getResource("/Event/MAX/RainEventGifMAX.gif"));
+        staticIcon = new ImageIcon(getClass().getResource("/Event/StaticEvent.png"));
+        artificialrainIconlIcon = new ImageIcon(getClass().getResource("/Event/PlaneEventGif.gif"));
+        rainyIcon = new ImageIcon(getClass().getResource("/Event/RainEventGif.gif"));
 
         eventAnimation = new JLabel(staticIcon);//ตั้งให้เป็นภาพนิ่ง 
         
@@ -470,15 +327,8 @@ public class GamePanel extends JPanel{
         simulateIcon = new ImageIcon(getClass().getResource("/button/StartButton.png"));
         stopIcon = new ImageIcon(getClass().getResource("/button/StopButton.png"));
 
-        openFileIconM = new ImageIcon(getClass().getResource("/button/MAX/OpenFileIconMAX.png"));
-        simulateIconM = new ImageIcon(getClass().getResource("/button/MAX/StartIconMAX.png"));
-        stopIconM = new ImageIcon(getClass().getResource("/button/MAX/StopIconMAX.png"));
-
         inputIcon = new ImageIcon(getClass().getResource("/image/menuCard/inputEvent.png"));
         eventIcon = new ImageIcon(getClass().getResource("/image/menuCard/menuEvent.png"));
-        inputIconM = new ImageIcon(getClass().getResource("/image/menuCard/MAX/inputEventMAX.png"));
-        eventIconM = new ImageIcon(getClass().getResource("/image/menuCard/MAX/menuEventMAX.png"));
-
 
         //สร้างปุ่ม Start,Stop,Open File
         openFileButton = new JButton(openFileIcon);
@@ -616,9 +466,9 @@ public class GamePanel extends JPanel{
             
         });
 
-        okButton.setBounds(153, 94, 26, 17);
+        okButton.setBounds(153, 95, 26, 17);
         randomButton.setBounds(12, 123, 165, 40);
-        inputPopulation.setBounds(80, 92, 80, 22);
+        inputPopulation.setBounds(80, 94, 75, 22);
         inputPopulation.setBackground(new Color(128, 146, 153));
         inputPopulation.setFont(new SetFont().getFont(14f));
         inputPopulation.setForeground(Color.WHITE);
@@ -713,10 +563,10 @@ public class GamePanel extends JPanel{
 
         //ตั้งตำแหน่งปุ่ม
         nextButton.setBounds(39, 330, 115, 40);
-        planeButton.setBounds(22, 97, 145, 69);
+        planeButton.setBounds(25, 99, 144, 69);
         planeButton.setBorderPainted(false);
         planeButton.setBackground(new Color(127,146,153));
-        rainButton.setBounds(21, 197, 148, 120);
+        rainButton.setBounds(24, 199, 146, 120);
         rainButton.setBorderPainted(false);
         rainButton.setBackground(new Color(127,146,153));
 
