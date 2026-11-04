@@ -96,11 +96,11 @@ public class GamePanel extends JPanel{
     //กำหนดตัวแปร Array ของ ปุ่มประชากรแต่พื้นที่
     private String statusShow[];
     private JButton populationฺBox[];
-    private int dustLevel[];
-    private int populationArray[];
-    private int healthyArray[];
-    private int patientArray[];
-    private int percentArray[];
+    private float dustLevel[];
+    private float populationArray[];
+    private float healthyArray[];
+    private float patientArray[];
+    private float percentArray[];
 
     //กำหนดตัวแปร  Components ใน Method createInputComponent
     private ImageIcon okIcon;
@@ -201,7 +201,6 @@ public class GamePanel extends JPanel{
 
         //สร้าง Button
         createMenuButton(); //สร้าง ปุ่มที่หน้า Menu ฝั่งขวา
-
         setStartGame();//ตั้งค่า Default ของ Game
         populationฺButtonAction(); //เพิ่ม Action ให้ปุ่ม
 
@@ -346,15 +345,6 @@ public class GamePanel extends JPanel{
         statusCard.add(statusCard2,"2");
         statusCard.add(statusCard3,"3");
         statusCard.add(statusCard4,"4");
-
-
-        //สร้าง object Array ค่าต่างๆภายในเกมส์
-        statusShow = new String[200];
-        populationฺBox = new JButton[200];
-        populationArray = new int[200];
-        healthyArray = new int[200];
-        patientArray = new int[200];
-        percentArray = new int[200];
         
 
         statusInfomation = new JLabel(statusInfomationIcon);
@@ -420,6 +410,7 @@ public class GamePanel extends JPanel{
     }
     //Method สร้าง Panel ตาราง 20*10 
     private void createTablePanel(){
+        populationฺBox = new JButton[200];
         for (int i = 0; i < populationฺBox.length; i++) {
             populationฺBox[i]=new JButton("",status0);
         }
@@ -776,7 +767,7 @@ public class GamePanel extends JPanel{
             String[] stringArray = data.split("\\s+");
 
         // สร้าง array ของ int เพื่อเก็บค่าที่แปลงแล้ว
-        dustLevel = new int[stringArray.length];
+        dustLevel = new float[stringArray.length];
 
         // แปลง string แต่ละตัวเป็น int แล้วเก็บใน int array
         for (int i = 0; i < stringArray.length; i++) {
@@ -837,7 +828,7 @@ public class GamePanel extends JPanel{
         percentText.setText("null");
         nextButton.setIcon(pauseIcon);
         try {
-            for (int i = 0; i < 200; i++) {
+            for (int i = 0; i < dustLevel.length; i++) {
                 statusShow[i]="0";
                 populationฺBox[i].setIcon(status0);
                 populationฺBox[i].setBackground(myDarkGrey);
@@ -847,6 +838,9 @@ public class GamePanel extends JPanel{
                 patientArray[i]=0;
                 percentArray[i]=0;
             }
+            for (int i = 0; i < populationฺBox.length; i++) {
+                populationฺBox[i].setBackground(myDarkGrey);
+            }
         } catch (NullPointerException e) {}
         this.revalidate();
         this.repaint();
@@ -854,105 +848,121 @@ public class GamePanel extends JPanel{
 
     //Method เริ่มการจำลอง
     private void startGame(int population,boolean isRandom){ 
+        //สร้าง object Array ค่าต่างๆภายในเกมส์
+        try {
+            statusShow = new String[dustLevel.length];
+            populationArray = new float[dustLevel.length];
+            healthyArray = new float[dustLevel.length];
+            patientArray = new float[dustLevel.length];
+            percentArray = new float[dustLevel.length];
+        } catch (NullPointerException e) {}
+        
+
         Random random = new Random();
         if (isRandom) {
-            for (int i = 0; i < populationฺBox.length; i++) {
+            for (int i = 0; i < dustLevel.length; i++) {
                 populationArray[i]=random.nextInt(population);
             }
         }
         else
         {
-            for (int i = 0; i < populationฺBox.length; i++) {
+            for (int i = 0; i < dustLevel.length; i++) {
                 populationArray[i]=population;
             }
         }
         paintGame(populationArray);
-        for (int i = 0; i < populationฺBox.length; i++) {
+        for (int i = 0; i < dustLevel.length; i++) {
             ImageIcon status = status0;
-            if (statusShow[i].equals("0")) {
-                status = status0;
-            }
-            else if (statusShow[i].equals("1")) {
-                status = status1;
-            }
-            else if (statusShow[i].equals("2")) {
-                status = status2;
-            }
-            else if (statusShow[i].equals("3")) {
-                status = status3;
-            }
-            else if (statusShow[i].equals("4")) {
-                status = status4;
-            }
+            try {
+                if (statusShow[i].equals("0")) {
+                    status = status0;
+                }
+                else if (statusShow[i].equals("1")) {
+                    status = status1;
+                }
+                else if (statusShow[i].equals("2")) {
+                    status = status2;
+                }
+                else if (statusShow[i].equals("3")) {
+                    status = status3;
+                }
+                else if (statusShow[i].equals("4")) {
+                    status = status4;
+                }
+            } catch (NullPointerException e) {}
+            
             populationฺBox[i].setIcon(status);
             populationฺBox[i].setBackground(myDarkGrey);
             populationฺBox[i].setBorderPainted(false);
             populationฺBox[i].setFocusPainted(false);
         }
     }
-    private void paintGame(int populationArray[]){
+    private void paintGame(float populationArray[]){
         String checkStatus = "0";
         try {
             
         } catch (Exception e) {
         }
-       for (int i = 0; i < populationฺBox.length; i++) {
-        if (dustLevel[i] >= 0 && dustLevel[i] <= 50) {
-            checkStatus = "1";
-            int minPercentage = 0;//เปอร์เซ็นต์ต่ำสุด
-            int maxPercentage = 9;//เปอร์เซ็นต์สูงสุด
-
-            // สร้าง Random object เพื่อสุ่มค่าเปอร์เซ็นต์
-            Random random = new Random();
-            percentArray[i] = random.nextInt(maxPercentage - minPercentage + 1) + minPercentage;
-
-            // คำนวณจำนวนคนที่ป่วย
-            patientArray[i] = (int) ((percentArray[i] / 100.0) * populationArray[i]);
-            healthyArray[i] = populationArray[i]-patientArray[i];
-            statusShow[i]=checkStatus; //เก็บว่าจะให้แสดงสีไหน
-        }
-        else if (dustLevel[i] >= 51 && dustLevel[i] <= 100) {
-            checkStatus = "2";
-            int minPercentage = 10;//เปอร์เซ็นต์ต่ำสุด
-            int maxPercentage = 19;//เปอร์เซ็นต์สูงสุด
-
-            // สร้าง Random object เพื่อสุ่มค่าเปอร์เซ็นต์
-            Random random = new Random();
-            percentArray[i] = random.nextInt(maxPercentage - minPercentage + 1) + minPercentage;
-
-            // คำนวณจำนวนคนที่ป่วย
-            patientArray[i] = (int) ((percentArray[i] / 100.0) * populationArray[i]);
-            healthyArray[i] = populationArray[i]-patientArray[i];
-            statusShow[i]=checkStatus; //เก็บว่าจะให้แสดงสีไหน
-        }
-        else if (dustLevel[i] >= 101 && dustLevel[i] <= 150) {
-            checkStatus = "3";
-            int minPercentage = 20;//เปอร์เซ็นต์ต่ำสุด
-            int maxPercentage = 29;//เปอร์เซ็นต์สูงสุด
-
-            // สร้าง Random object เพื่อสุ่มค่าเปอร์เซ็นต์
-            Random random = new Random();
-            percentArray[i] = random.nextInt(maxPercentage - minPercentage + 1) + minPercentage;
-
-            // คำนวณจำนวนคนที่ป่วย
-            patientArray[i] = (int) ((percentArray[i] / 100.0) * populationArray[i]);
-            healthyArray[i] = (int)populationArray[i]-patientArray[i];
-            statusShow[i]=checkStatus; //เก็บว่าจะให้แสดงสีไหน
-        }
-        else if (dustLevel[i] >= 151 && dustLevel[i] <= 250) {
-            checkStatus = "4";
-            int minPercentage = 30;//เปอร์เซ็นต์ต่ำสุด
-            int maxPercentage = 50;//เปอร์เซ็นต์สูงสุด
-
-            // สร้าง Random object เพื่อสุ่มค่าเปอร์เซ็นต์
-            Random random = new Random();
-            percentArray[i] = random.nextInt(maxPercentage - minPercentage + 1) + minPercentage;
-
-            // คำนวณจำนวนคนที่ป่วย
-            patientArray[i] = (int) ((percentArray[i] / 100.0) * populationArray[i]);
-            healthyArray[i] = populationArray[i]-patientArray[i];
-            statusShow[i]=checkStatus; //เก็บว่าจะให้แสดงสีไหน
-        }
+       for (int i = 0; i < dustLevel.length; i++) {
+            if (dustLevel[i]>=0&&dustLevel[i]<=250) {
+                if (dustLevel[i] >= 0 && dustLevel[i] <= 50) {
+                    checkStatus = "1";
+                    int minPercentage = 0;//เปอร์เซ็นต์ต่ำสุด
+                    int maxPercentage = 9;//เปอร์เซ็นต์สูงสุด
+    
+                    // สร้าง Random object เพื่อสุ่มค่าเปอร์เซ็นต์
+                    Random random = new Random();
+                    percentArray[i] = random.nextInt(maxPercentage - minPercentage + 1) + minPercentage;
+    
+                    // คำนวณจำนวนคนที่ป่วย
+                    patientArray[i] = (int) ((percentArray[i] / 100.0) * populationArray[i]);
+                    healthyArray[i] = populationArray[i]-patientArray[i];
+                    statusShow[i]=checkStatus; //เก็บว่าจะให้แสดงสีไหน
+                }
+                else if (dustLevel[i] >= 51 && dustLevel[i] <= 100) {
+                    checkStatus = "2";
+                    int minPercentage = 10;//เปอร์เซ็นต์ต่ำสุด
+                    int maxPercentage = 19;//เปอร์เซ็นต์สูงสุด
+    
+                    // สร้าง Random object เพื่อสุ่มค่าเปอร์เซ็นต์
+                    Random random = new Random();
+                    percentArray[i] = random.nextInt(maxPercentage - minPercentage + 1) + minPercentage;
+    
+                    // คำนวณจำนวนคนที่ป่วย
+                    patientArray[i] = (int) ((percentArray[i] / 100.0) * populationArray[i]);
+                    healthyArray[i] = populationArray[i]-patientArray[i];
+                    statusShow[i]=checkStatus; //เก็บว่าจะให้แสดงสีไหน
+                }
+                else if (dustLevel[i] >= 101 && dustLevel[i] <= 150) {
+                    checkStatus = "3";
+                    int minPercentage = 20;//เปอร์เซ็นต์ต่ำสุด
+                    int maxPercentage = 29;//เปอร์เซ็นต์สูงสุด
+    
+                    // สร้าง Random object เพื่อสุ่มค่าเปอร์เซ็นต์
+                    Random random = new Random();
+                    percentArray[i] = random.nextInt(maxPercentage - minPercentage + 1) + minPercentage;
+    
+                    // คำนวณจำนวนคนที่ป่วย
+                    patientArray[i] = (int) ((percentArray[i] / 100.0) * populationArray[i]);
+                    healthyArray[i] = (int)populationArray[i]-patientArray[i];
+                    statusShow[i]=checkStatus; //เก็บว่าจะให้แสดงสีไหน
+                }
+                else if (dustLevel[i] >= 151 && dustLevel[i] <= 250) {
+                    checkStatus = "4";
+                    int minPercentage = 30;//เปอร์เซ็นต์ต่ำสุด
+                    int maxPercentage = 50;//เปอร์เซ็นต์สูงสุด
+    
+                    // สร้าง Random object เพื่อสุ่มค่าเปอร์เซ็นต์
+                    Random random = new Random();
+                    percentArray[i] = random.nextInt(maxPercentage - minPercentage + 1) + minPercentage;
+    
+                    // คำนวณจำนวนคนที่ป่วย
+                    patientArray[i] = (int) ((percentArray[i] / 100.0) * populationArray[i]);
+                    healthyArray[i] = populationArray[i]-patientArray[i];
+                    statusShow[i]=checkStatus; //เก็บว่าจะให้แสดงสีไหน
+                }
+            }
+            
        }
     }
     private void populationฺButtonAction(){
@@ -987,12 +997,22 @@ public class GamePanel extends JPanel{
     private void showInfomation(int index){
         setAreaIndex(index);
         areaText.setText(""+(index+1));
-        dustText.setText(""+dustLevel[index]);
-        populationText.setText(""+populationArray[index]);
-        healthyText.setText(""+healthyArray[index]);
-        patientText.setText(""+patientArray[index]);
-        percentText.setText(""+percentArray[index]+"%");
-        statusLayout.show(statusCard, statusShow[index]);
+        try {
+            dustText.setText(""+(int)dustLevel[index]);
+            populationText.setText(""+(int)populationArray[index]);
+            healthyText.setText(""+(int)healthyArray[index]);
+            patientText.setText(""+(int)patientArray[index]);
+            percentText.setText(""+(int)percentArray[index]+"%");
+            statusLayout.show(statusCard, statusShow[index]);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            dustText.setText("null");
+            populationText.setText("null");
+            healthyText.setText("null");
+            patientText.setText("null");
+            percentText.setText("null");
+            statusLayout.show(statusCard, "0");
+        }
+        
         repaint();
     } 
     public void rainEvent(){
@@ -1006,11 +1026,11 @@ public class GamePanel extends JPanel{
                 if (!stopEvent) {
                     eventAnimation.setIcon(staticIcon);
                     for (int i = 0; i < dustLevel.length; i++) {
-                        if (dustLevel[i]>0) {
+                        if (dustLevel[i]>=0&&dustLevel[i]<=250) {
                             dustLevel[i]=dustLevel[i]-50;
-                        }
-                        if (dustLevel[i]<0) {
-                            dustLevel[i]=0;
+                            if (dustLevel[i]<0) {
+                                dustLevel[i]=0;
+                            }
                         }
                     }
                     updateGame();
@@ -1057,8 +1077,14 @@ public class GamePanel extends JPanel{
             public void actionPerformed(ActionEvent e) {
                 if (!stopEvent) {
                     eventAnimation.setIcon(staticIcon);
-                    dustLevel[index] = dustLevel[index]-(dustLevel[index]*50/100); //ปุ่มที่กดลด 50%
-                    populationฺBox[index].setBackground(myDarkGrey);
+                    try {     
+                        populationฺBox[index].setBackground(myDarkGrey);
+                        if (dustLevel[index] >= 0 && dustLevel[index] <=250) {
+                            dustLevel[index] = dustLevel[index]-(dustLevel[index]*50/100); //ปุ่มที่กดลด 50%
+                        }
+                    } catch (ArrayIndexOutOfBoundsException x) {
+                        populationฺBox[index].setBackground(myDarkGrey);
+                    }
                     for (int dy = -1; dy <= 1; dy++) {
                         for (int dx = -1; dx <= 1; dx++) {
                             if (dx == 0 && dy == 0) continue;
@@ -1068,8 +1094,15 @@ public class GamePanel extends JPanel{
 
                             if (nx >= 0 && nx < GRID_WIDTH && ny >= 0 && ny < GRID_HEIGHT) {
                                 int neighborIndex = ny * GRID_WIDTH + nx;
-                                dustLevel[neighborIndex] = dustLevel[neighborIndex]-(dustLevel[neighborIndex]*30/100);//ปุ่มรอบๆลด 30%
-                                populationฺBox[neighborIndex].setBackground(myDarkGrey);
+                                
+                                try {
+                                    populationฺBox[neighborIndex].setBackground(myDarkGrey);
+                                    if (dustLevel[neighborIndex] >= 0 && dustLevel[neighborIndex] <=250) {
+                                        dustLevel[neighborIndex] = dustLevel[neighborIndex]-(dustLevel[neighborIndex]*30/100);//ปุ่มรอบๆลด 30%
+                                    }
+                                } catch (ArrayIndexOutOfBoundsException x) {
+                                    populationฺBox[neighborIndex].setBackground(myDarkGrey);
+                                }
                             }
                         }
                     }
@@ -1086,22 +1119,26 @@ public class GamePanel extends JPanel{
     }
     public void updateGame(){
         paintGame(populationArray);
-        for (int i = 0; i < populationฺBox.length; i++) {
+        for (int i = 0; i < dustLevel.length; i++) {
             ImageIcon status = status0;
-            if (statusShow[i].equals("0")) {
+            try {
+                if (statusShow[i].equals("0")) {
+                    status = status0;
+                }
+                else if (statusShow[i].equals("1")) {
+                    status = status1;
+                }
+                else if (statusShow[i].equals("2")) {
+                    status = status2;
+                }
+                else if (statusShow[i].equals("3")) {
+                    status = status3;
+                }
+                else if (statusShow[i].equals("4")) {
+                    status = status4;
+                }
+            } catch (NullPointerException e) {
                 status = status0;
-            }
-            else if (statusShow[i].equals("1")) {
-                status = status1;
-            }
-            else if (statusShow[i].equals("2")) {
-                status = status2;
-            }
-            else if (statusShow[i].equals("3")) {
-                status = status3;
-            }
-            else if (statusShow[i].equals("4")) {
-                status = status4;
             }
             populationฺBox[i].setIcon(status);
         }
