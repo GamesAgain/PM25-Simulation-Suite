@@ -65,7 +65,7 @@ public class GameWindow extends JFrame {
 
     @Override
     public Image getIconImage() {
-        gameImageIcon = new ImageIcon("image\\tableType\\Demo\\type1.png");
+        gameImageIcon = new ImageIcon(getClass().getResource("/image/GameIcon.png"));
         return gameImageIcon.getImage();
     }
 
