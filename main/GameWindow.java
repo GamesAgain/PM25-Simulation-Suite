@@ -81,4 +81,7 @@ public class GameWindow extends JFrame {
         isMaximized=false;
         setExtendedState(JFrame.NORMAL);
     }
+    public GamePanel getGamePanel(){
+        return this.gamePanel;
+    }
 }

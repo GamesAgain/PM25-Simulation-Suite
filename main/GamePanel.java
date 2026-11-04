@@ -30,6 +30,7 @@ import javax.swing.Timer;
 import font.SetFont;
 
 public class GamePanel extends JPanel{
+    private boolean stopEvent = false;
     private TimeSystem timeSystem;
 
     private boolean isStarted = false;//เช็คว่าเกมส์เริ่มอย่ไหม
@@ -153,6 +154,9 @@ public class GamePanel extends JPanel{
     public boolean canPlaneEvent = true;//ฝนเทียมติดคลูดาวน์ไหม
     private boolean isPause = false;
     public boolean artIsEnabled = false;
+
+    private Timer planeAnimTimer;
+    private Timer rainAnimTimer;
 
     public GamePanel(GameWindow gameWindow){
         //เพิ่มภาพลง Cursor
@@ -552,6 +556,7 @@ public class GamePanel extends JPanel{
                         readFile(selectedFile);
                         menuLayout.show(menuCard, "Input");//โชว์หน้า Input
                         isStarted=true;
+                        stopEvent = false;
                     }
                     else
                     {
@@ -570,10 +575,7 @@ public class GamePanel extends JPanel{
         stopButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                isStarted = false;
-                menuLayout.show(menuCard, "Empty");
                 restartGame();//reset เกมส์
-                timeSystem.restart();//reset เวลา
             }
             
         });
@@ -802,9 +804,19 @@ public class GamePanel extends JPanel{
             populationฺBox[i].setCursor(checkInfoCursor);
             tablePanel.add(populationฺBox[i]);
         }
-        
     }
-    private void restartGame(){
+    public void restartGame(){
+        stopEvent = true;
+        //กำหนดเป็นค่าเริ่มต้น
+        canRainny = true;
+        canPlaneEvent = true;
+        isPause = false;
+        artIsEnabled = false;
+        isStarted = false;
+
+        menuLayout.show(menuCard, "Empty");
+        timeSystem.restart();//reset เวลา
+        eventAnimation.setIcon(staticIcon);
         statusLayout.show(statusCard, "0");
         areaText.setText("null");
         dustText.setText("null");
@@ -817,17 +829,16 @@ public class GamePanel extends JPanel{
             for (int i = 0; i < 200; i++) {
                 statusShow[i]="0";
                 populationฺBox[i].setIcon(status0);
+                populationฺBox[i].setBackground(myDarkGrey);
                 dustLevel[i]=0;
                 populationArray[i]=0;
                 healthyArray[i]=0;
                 patientArray[i]=0;
                 percentArray[i]=0;
             }
-        } catch (NullPointerException e) {
-
-
-        }
-        
+        } catch (NullPointerException e) {}
+        this.revalidate();
+        this.repaint();
     }
 
     //Method เริ่มการจำลอง
@@ -978,28 +989,31 @@ public class GamePanel extends JPanel{
         //เมื่อเวลาผ่านไป 2.5 วิ จะปิด Gif
         eventAnimation.setIcon(rainyIcon);
         repaint();
-        Timer timer = new Timer(5500, new ActionListener() {
+        rainAnimTimer = new Timer(5500, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                eventAnimation.setIcon(staticIcon);
-                for (int i = 0; i < dustLevel.length; i++) {
-                    if (dustLevel[i]>0) {
-                        dustLevel[i]=dustLevel[i]-50;
+                if (!stopEvent) {
+                    eventAnimation.setIcon(staticIcon);
+                    for (int i = 0; i < dustLevel.length; i++) {
+                        if (dustLevel[i]>0) {
+                            dustLevel[i]=dustLevel[i]-50;
+                        }
+                        if (dustLevel[i]<0) {
+                            dustLevel[i]=0;
+                        }
                     }
-                    if (dustLevel[i]<0) {
-                        dustLevel[i]=0;
-                    }
+                    updateGame();
+                    showInfomation(getAreaIndex());
+                    canRainny = true;
                 }
-                updateGame();
-                showInfomation(getAreaIndex());
-                canRainny = true;
             }
         });
-        timer.setRepeats(false); // ตั้งค่าให้ทำงานครั้งเดียว
-        timer.start();
+        rainAnimTimer.setRepeats(false); // ตั้งค่าให้ทำงานครั้งเดียว
+        rainAnimTimer.start();
     }
     private void planeEvent(int index){
         Color color = Color.GREEN;
+        eventAnimation.setIcon(artificialrainIconlIcon);
         if (index-21>=0&&index-21<=199) {
             populationฺBox[index-21].setBackground(color);
         }
@@ -1030,66 +1044,69 @@ public class GamePanel extends JPanel{
         if (index+21>=0&&index+21<=199) {
             populationฺBox[index+21].setBackground(color);
         }
-        eventAnimation.setIcon(artificialrainIconlIcon);
         for (int i = 0; i < populationฺBox.length; i++) {
             populationฺBox[i].setCursor(checkInfoCursor);
         }
 
         repaint();
         canPlaneEvent = false;
-        Timer timer = new Timer(8000, new ActionListener() {
+        planeAnimTimer = new Timer(8000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                eventAnimation.setIcon(staticIcon);
+                if (!stopEvent) {
+                    eventAnimation.setIcon(staticIcon);
                 //3 ตัวบน
-                if (index-21>=0&&index-21<=199) {
-                    dustLevel[index-21] = dustLevel[index-21]-(dustLevel[index-21]*30/100);
-                    populationฺBox[index-21].setBackground(myDarkGrey);
-                }
-                if (index-20>=0&&index-20<=199) {
-                     dustLevel[index-20] = dustLevel[index-20]-(dustLevel[index-20]*30/100);
-                     populationฺBox[index-20].setBackground(myDarkGrey);
-                }
-                if (index-19>=0&&index-19<=199) {
-                    dustLevel[index-19] = dustLevel[index-19]-(dustLevel[index-19]*30/100);
-                    populationฺBox[index-19].setBackground(myDarkGrey);
+                    if (index-21>=0&&index-21<=199) {
+                        dustLevel[index-21] = dustLevel[index-21]-(dustLevel[index-21]*30/100);
+                        populationฺBox[index-21].setBackground(myDarkGrey);
+                    }
+                    if (index-20>=0&&index-20<=199) {
+                        dustLevel[index-20] = dustLevel[index-20]-(dustLevel[index-20]*30/100);
+                        populationฺBox[index-20].setBackground(myDarkGrey);
+                    }
+                    if (index-19>=0&&index-19<=199) {
+                        dustLevel[index-19] = dustLevel[index-19]-(dustLevel[index-19]*30/100);
+                        populationฺBox[index-19].setBackground(myDarkGrey);
+                    }
+                    
+
+                    // 3 ตัวตรงกลาง 
+                    if (index-1>=0&&index-1<=199) {
+                        dustLevel[index-1] = dustLevel[index-1]-(dustLevel[index-1]*30/100);
+                        populationฺBox[index-1].setBackground(myDarkGrey);
+                    }
+                    dustLevel[index] = dustLevel[index]-(dustLevel[index]*50/100); //ตัวที่กดเครื่องบินใส่
+                    populationฺBox[index].setBackground(myDarkGrey);
+                    if (index+1>=0&&index+1<=199) {
+                            dustLevel[index+1] = dustLevel[index+1]-(dustLevel[index+1]*30/100);
+                            populationฺBox[index+1].setBackground(myDarkGrey);
+                    }
+
+                    // 3 ตัวด้านล่าง
+                    if (index+19>=0&&index+19<=199) {
+                        dustLevel[index+19] = dustLevel[index+19]-(dustLevel[index+19]*30/100);
+                        populationฺBox[index+19].setBackground(myDarkGrey);
+                    }
+                    if (index+20>=0&&index+20<=199) {
+                        dustLevel[index+20] = dustLevel[index+20]-(dustLevel[index+20]*30/100);
+                        populationฺBox[index+20].setBackground(myDarkGrey);
+                    }
+                    if (index+21>=0&&index+21<=199) {
+                        dustLevel[index+21] = dustLevel[index+21]-(dustLevel[index+21]*30/100);
+                        populationฺBox[index+21].setBackground(myDarkGrey);
+                    }
+                    tablePanel.revalidate();
+                    tablePanel.repaint();
+                    updateGame();
+                    showInfomation(getAreaIndex());
+                    canPlaneEvent = true;
+                    System.out.println("RADASDA");
                 }
                 
-
-                // 3 ตัวตรงกลาง 
-                if (index-1>=0&&index-1<=199) {
-                    dustLevel[index-1] = dustLevel[index-1]-(dustLevel[index-1]*30/100);
-                    populationฺBox[index-1].setBackground(myDarkGrey);
-                }
-                dustLevel[index] = dustLevel[index]-(dustLevel[index]*50/100); //ตัวที่กดเครื่องบินใส่
-                populationฺBox[index].setBackground(myDarkGrey);
-                if (index+1>=0&&index+1<=199) {
-                        dustLevel[index+1] = dustLevel[index+1]-(dustLevel[index+1]*30/100);
-                        populationฺBox[index+1].setBackground(myDarkGrey);
-                }
-
-                 // 3 ตัวด้านล่าง
-                if (index+19>=0&&index+19<=199) {
-                    dustLevel[index+19] = dustLevel[index+19]-(dustLevel[index+19]*30/100);
-                    populationฺBox[index+19].setBackground(myDarkGrey);
-                }
-                if (index+20>=0&&index+20<=199) {
-                    dustLevel[index+20] = dustLevel[index+20]-(dustLevel[index+20]*30/100);
-                    populationฺBox[index+20].setBackground(myDarkGrey);
-                }
-                if (index+21>=0&&index+21<=199) {
-                    dustLevel[index+21] = dustLevel[index+21]-(dustLevel[index+21]*30/100);
-                    populationฺBox[index+21].setBackground(myDarkGrey);
-                }
-                tablePanel.revalidate();
-                tablePanel.repaint();
-                updateGame();
-                showInfomation(getAreaIndex());
-                canPlaneEvent = true;
             }
         });
-        timer.setRepeats(false);// ตั้งค่าให้ทำงานครั้งเดียว
-        timer.start();
+        planeAnimTimer.setRepeats(false);// ตั้งค่าให้ทำงานครั้งเดียว
+        planeAnimTimer.start();
         
     }
     public void updateGame(){

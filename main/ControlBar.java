@@ -125,6 +125,7 @@ public class ControlBar extends JPanel{
             @Override
             public void actionPerformed(ActionEvent e) {
                 gameWindow.showMenuPanel();
+                gameWindow.getGamePanel().restartGame();
             }
             
         });
